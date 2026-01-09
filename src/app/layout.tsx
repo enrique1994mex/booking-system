@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
+import AntdRegistry from "@/app/AntdRegistry";
 import { ConfigProvider } from "antd";
 import { antdTheme } from "@/ui/theme/antdTheme";
 import { RootLayout } from "@/ui/layouts/RootLayout";
