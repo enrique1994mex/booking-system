@@ -3,6 +3,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
 import { antdTheme } from "@/ui/theme/antdTheme";
 import { RootLayout } from "@/ui/layouts/RootLayout";
+import { Providers } from "@/app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +19,9 @@ export default function Layout({
   return (
     <AntdRegistry>
       <ConfigProvider theme={antdTheme}>
-        <RootLayout>{children}</RootLayout>
+        <Providers>
+          <RootLayout>{children}</RootLayout>
+        </Providers>
       </ConfigProvider>
     </AntdRegistry>
   );
