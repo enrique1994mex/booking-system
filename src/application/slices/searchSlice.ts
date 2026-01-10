@@ -5,6 +5,7 @@ import { MockRoomRepository } from '@/infrastructure/repositories/MockRoomReposi
 import { MockAccommodationRepository } from '@/infrastructure/repositories/MockAccommodationRepository';
 import type { Room } from '@/domain/entities/Room';
 import type { Accommodation } from '@/domain/entities/Accommodation';
+import { hideGlobalLoading, showGlobalLoading } from './uiSlice';
 
 interface SearchParams {
   location: string;
@@ -29,9 +30,13 @@ const initialState: SearchState = {
   results: [],
 };
 
-export const searchAvailableRooms = createAsyncThunk(
+export const searchAvailableRooms = createAsyncThunk<
+  SearchResult[],
+  SearchParams,
+   { rejectValue: string }
+>(
   'search/searchAvailableRooms',
-  async (params: SearchParams) => {
+  async (params: SearchParams, { dispatch, rejectWithValue }) => {
     const dateRange = new DateRange(
       new Date(params.startDate),
       new Date(params.endDate)
@@ -39,32 +44,41 @@ export const searchAvailableRooms = createAsyncThunk(
 
     const roomRepository = new MockRoomRepository();
     const accommodationRepository = new MockAccommodationRepository();
+
+    dispatch(showGlobalLoading());
     const useCase = new SearchAvailableRooms(accommodationRepository,roomRepository);
 
-    const result = await useCase.execute({
-      location: params.location,
-      dateRange,
-    });
-
-    // ADAPTACIÓN Application → UI
-    const groupedResults = result.reduce((acc, item) => {
-    const existing = acc.find(
-      (r) => r.accommodation.id === item.accommodation.id
-    );
-
-    if (existing) {
-      existing.rooms.push(item.room);
-    } else {
-        acc.push({
-        accommodation: item.accommodation, 
-        rooms: [item.room],
+    try {
+      const result = await useCase.execute({
+        location: params.location,
+        dateRange,
       });
+
+      // ADAPTACIÓN Application → UI
+      const groupedResults = result.reduce((acc, item) => {
+      const existing = acc.find(
+        (r) => r.accommodation.id === item.accommodation.id
+      );
+
+      if (existing) {
+        existing.rooms.push(item.room);
+      } else {
+          acc.push({
+          accommodation: item.accommodation, 
+          rooms: [item.room],
+        });
+      }
+
+      return acc;
+      }, [] as SearchResult[]);
+
+      return groupedResults;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      return rejectWithValue('Search failed. Please try again.');
+    } finally {
+      dispatch(hideGlobalLoading());
     }
-
-    return acc;
-    }, [] as SearchResult[]);
-
-    return groupedResults;
   }
 );
 
@@ -87,9 +101,9 @@ const searchSlice = createSlice({
         state.loading = false;
         state.results = action.payload;
       })
-      .addCase(searchAvailableRooms.rejected, (state) => {
+      .addCase(searchAvailableRooms.rejected, (state, action) => {
         state.loading = false;
-        state.error = 'Error searching available rooms';
+        state.error = action.payload ?? 'Unexpected error';
       });
   },
 });

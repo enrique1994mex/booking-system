@@ -25,7 +25,7 @@ export function SearchForm() {
   };
 
   return (
-    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+    <Space orientation="vertical" size="middle" style={{ width: '100%', marginBottom: '16px' }}>
       <Input
         placeholder="Location"
         value={location}

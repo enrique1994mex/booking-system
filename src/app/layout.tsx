@@ -3,6 +3,7 @@ import AntdRegistry from "@/app/AntdRegistry";
 import { ConfigProvider } from "antd";
 import { antdTheme } from "@/ui/theme/antdTheme";
 import { RootLayout } from "@/ui/layouts/RootLayout";
+import { GlobalLoader } from "@/ui/components/GlobalLoader";
 import { Providers } from "@/app/providers";
 import "./globals.css";
 
@@ -20,6 +21,7 @@ export default function Layout({
     <AntdRegistry>
       <ConfigProvider theme={antdTheme}>
         <Providers>
+          <GlobalLoader />
           <RootLayout>{children}</RootLayout>
         </Providers>
       </ConfigProvider>
