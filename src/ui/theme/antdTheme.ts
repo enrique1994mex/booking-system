@@ -2,7 +2,7 @@ import type { ThemeConfig } from "antd";
 
 export const antdTheme: ThemeConfig = {
   token: {
-    colorPrimary: "#FF385C",
+    controlHeight: 48,
     borderRadius: 8,
   },
 };

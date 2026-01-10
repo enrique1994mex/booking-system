@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Input, DatePicker, Button, Space } from 'antd';
+import { Input, DatePicker, Button, Flex } from 'antd';
 import { useAppDispatch } from '@/application/hooks';
 import { searchAvailableRooms } from '@/application/slices/searchSlice';
 import dayjs from 'dayjs';
@@ -25,22 +25,25 @@ export function SearchForm() {
   };
 
   return (
-    <Space orientation="vertical" size="middle" style={{ width: '100%', marginBottom: '16px' }}>
+    <Flex gap="middle" justify="center" align="center" style={{ marginBottom: 16 }}>
       <Input
+        size="large"
         placeholder="Location"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
+        style={{ width: 200 }}
       />
 
       <DatePicker.RangePicker
+        size="large"
         value={dates}
         onChange={(value) => setDates(value as [dayjs.Dayjs, dayjs.Dayjs] | null)}
-        style={{ width: '100%' }}
+        style={{ width: 300 }}
       />
 
-      <Button type="primary" onClick={onSearch}>
+      <Button size="large" type="primary" onClick={onSearch}>
         Search
       </Button>
-    </Space>
+    </Flex>
   );
 }

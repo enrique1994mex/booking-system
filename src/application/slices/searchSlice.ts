@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { SearchAvailableRooms } from '@/domain/use-cases/SearchAvailableRooms';
 import { DateRange } from '@/domain/value-objects/DateRange';
-import { MockRoomRepository } from '@/infrastructure/repositories/MockRoomRepository';
-import { MockAccommodationRepository } from '@/infrastructure/repositories/MockAccommodationRepository';
+import { createRepositories } from '@/infrastructure/factories/createRepositories';
 import type { Room } from '@/domain/entities/Room';
 import type { Accommodation } from '@/domain/entities/Accommodation';
 import { hideGlobalLoading, showGlobalLoading } from './uiSlice';
@@ -33,22 +32,24 @@ const initialState: SearchState = {
 export const searchAvailableRooms = createAsyncThunk<
   SearchResult[],
   SearchParams,
-   { rejectValue: string }
+  { rejectValue: string }
 >(
   'search/searchAvailableRooms',
   async (params: SearchParams, { dispatch, rejectWithValue }) => {
-    const dateRange = new DateRange(
-      new Date(params.startDate),
-      new Date(params.endDate)
-    );
-
-    const roomRepository = new MockRoomRepository();
-    const accommodationRepository = new MockAccommodationRepository();
-
     dispatch(showGlobalLoading());
-    const useCase = new SearchAvailableRooms(accommodationRepository,roomRepository);
 
     try {
+      // Crear rangos de fechas
+      const dateRange = new DateRange(
+        new Date(params.startDate),
+        new Date(params.endDate)
+      );
+
+      // Crear repositorios
+      const { roomRepository, accommodationRepository } = createRepositories();
+
+      const useCase = new SearchAvailableRooms(accommodationRepository,roomRepository);
+
       const result = await useCase.execute({
         location: params.location,
         dateRange,
