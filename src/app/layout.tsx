@@ -8,7 +8,7 @@ import { Providers } from "@/app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Airbnb Clone",
+  title: "Travel Reserveation System",
   description: "Booking platform",
 };
 

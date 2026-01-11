@@ -1,8 +1,9 @@
 "use client";
-import { Layout } from "antd";
+import { Layout, Typography, Button, Flex, Space } from "antd";
 import { Geist, Geist_Mono } from "next/font/google";
 
 const { Header, Content, Footer } = Layout;
+const { Title } = Typography;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,16 +25,23 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
         >
           <Header
             style={{
-            background: "#fff",
+            background: "transparent",
             borderBottom: "1px solid #f0f0f0",
             padding: "0 24px",
           }}
           >
-            Airbnb Clone
+            <Flex justify="space-around" align="center">
+              <Title level={3}>Travel Reservation System</Title>
+              <Space>
+                <Button type="link">Sign In</Button>
+                <Button type="primary">Sign Up</Button>
+              </Space>
+
+            </Flex>
           </Header>
           <Content style={{ padding: "20px" }}>{children}</Content>
           <Footer style={{ textAlign: "center" }}>
-            © 2024 Airbnb Clone. All rights reserved.
+            © 2024 Travel Reservation System. All rights reserved.
           </Footer>
         </Layout>
       </body>

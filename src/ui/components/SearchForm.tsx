@@ -31,7 +31,7 @@ export function SearchForm() {
         placeholder="Location"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
-        style={{ width: 200 }}
+        style={{ width: 300 }}
       />
 
       <DatePicker.RangePicker
