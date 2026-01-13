@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Input, DatePicker, Button, Flex } from 'antd';
+import { DatePicker, Button, Flex } from 'antd';
+import { LocationSearch } from "./LocationSearch";
 import { useAppDispatch } from '@/application/hooks';
 import { searchAvailableRooms } from '@/application/slices/searchSlice';
 import dayjs from 'dayjs';
@@ -26,13 +27,7 @@ export function SearchForm() {
 
   return (
     <Flex gap="middle" justify="center" align="center" style={{ marginBottom: 16 }}>
-      <Input
-        size="large"
-        placeholder="Location"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        style={{ width: 300 }}
-      />
+      <LocationSearch onSelect={(loc) => setLocation(`${loc.name}, ${loc.country}`)} />
 
       <DatePicker.RangePicker
         size="large"
