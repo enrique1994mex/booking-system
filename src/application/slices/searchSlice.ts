@@ -5,7 +5,10 @@ import { createRepositories } from '@/infrastructure/factories/createRepositorie
 import { hideGlobalLoading, showGlobalLoading } from './uiSlice';
 
 interface SearchParams {
-  location: string;
+  location: {
+    city: string;
+    country: string;
+  };
   startDate: string;
   endDate: string;
 }
@@ -34,7 +37,7 @@ export const searchAvailableAccomodations = createAsyncThunk<
   SearchParams,
   { rejectValue: string }
 >(
-  'search/searchAvailableAccomodations',
+  'search/searchAvailableAccommodations',
   async (params: SearchParams, { dispatch, rejectWithValue }) => {
     dispatch(showGlobalLoading());
 
@@ -51,7 +54,10 @@ export const searchAvailableAccomodations = createAsyncThunk<
       const useCase = new SearchAccommodations(accommodationRepository, roomRepository);
 
       const result = await useCase.execute({
-        location: params.location,
+        location: {
+          city: params.location.city,
+          country: params.location.country,
+        },
         dateRange,
       });
 

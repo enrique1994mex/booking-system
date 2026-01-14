@@ -14,7 +14,7 @@ interface AutoCompleteOption {
   loc: Location;
 }
 
-export function LocationSearch({ onSelect }: LocationSearchProps) {
+export function LocationSearchUI({ onSelect }: LocationSearchProps) {
   const [options, setOptions] = useState<AutoCompleteOption[]>([]);
 
   const search = debounce(async (value: string) => {

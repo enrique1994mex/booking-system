@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { DatePicker, Button, Flex } from 'antd';
-import { LocationSearch } from "./LocationSearch";
+import { LocationSearchUI } from "./LocationSearchUI";
+import { LocationSearch } from "@/domain/value-objects/LocationSearch";
 import { useAppDispatch } from '@/application/hooks';
 import { searchAvailableAccomodations } from '@/application/slices/searchSlice';
 import dayjs from 'dayjs';
@@ -10,11 +11,12 @@ import dayjs from 'dayjs';
 export function SearchForm() {
   const dispatch = useAppDispatch();
 
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState<LocationSearch>({ city: '', country: '' });
   const [dates, setDates] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
 
   const onSearch = () => {
     if (!dates) return;
+    if (!location.city && !location.country) return;
 
     dispatch(
       searchAvailableAccomodations({
@@ -27,7 +29,7 @@ export function SearchForm() {
 
   return (
     <Flex gap="middle" justify="center" align="center" style={{ marginBottom: 16 }}>
-      <LocationSearch onSelect={(loc) => setLocation(loc.name)} />
+      <LocationSearchUI onSelect={(loc) => setLocation({ city: loc.name, country: loc.country })} />
 
       <DatePicker.RangePicker
         size="large"

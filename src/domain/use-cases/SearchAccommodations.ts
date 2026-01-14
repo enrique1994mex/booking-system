@@ -10,7 +10,10 @@ export class SearchAccommodations {
   ) {}
 
   async execute(input: {
-    location: string;
+    location: {
+      city: string;
+      country: string;
+    };
     dateRange: DateRange;
   }): Promise<AccommodationSearchResult[]> {
     const { location, dateRange } = input;
