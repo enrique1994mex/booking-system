@@ -18,25 +18,11 @@ export function SearchResults() {
     <Space orientation="vertical" size="large" style={{ width: '100%' }}>
       {results.map((result) => (
         <Card
-          key={result.accommodation.id}
-          title={result.accommodation.name}
+          key={result.id}
+          title={result.name}
         >
-          <Space orientation="vertical" style={{ width: '100%' }}>
-            {result.rooms.map((room) => (
-              <Card
-                key={room.id}
-                size="small"
-                type="inner"
-              >
-                <Space
-                  style={{ width: '100%', justifyContent: 'space-between' }}
-                >
-                  <Text strong>{room.accommodationId}</Text>
-                  <Text>${room.pricePerNight} / night</Text>
-                </Space>
-              </Card>
-            ))}
-          </Space>
+          <Text>Location: {result.location}</Text><br />
+          <Text>Price From: ${result.priceFrom.toFixed(2)} per night</Text>
         </Card>
       ))}
     </Space>

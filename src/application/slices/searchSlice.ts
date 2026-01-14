@@ -1,9 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { SearchAvailableRooms } from '@/domain/use-cases/SearchAvailableRooms';
+import { SearchAccommodations } from '@/domain/use-cases/SearchAccommodations';
 import { DateRange } from '@/domain/value-objects/DateRange';
 import { createRepositories } from '@/infrastructure/factories/createRepositories';
-import type { Room } from '@/domain/entities/Room';
-import type { Accommodation } from '@/domain/entities/Accommodation';
 import { hideGlobalLoading, showGlobalLoading } from './uiSlice';
 
 interface SearchParams {
@@ -13,8 +11,10 @@ interface SearchParams {
 }
 
 interface SearchResult {
-  accommodation: Accommodation;
-  rooms: Room[];
+  id: string;
+  name: string;
+  location: string;
+  priceFrom: number;
 }
 
 interface SearchState {
@@ -29,12 +29,12 @@ const initialState: SearchState = {
   results: [],
 };
 
-export const searchAvailableRooms = createAsyncThunk<
+export const searchAvailableAccomodations = createAsyncThunk<
   SearchResult[],
   SearchParams,
   { rejectValue: string }
 >(
-  'search/searchAvailableRooms',
+  'search/searchAvailableAccomodations',
   async (params: SearchParams, { dispatch, rejectWithValue }) => {
     dispatch(showGlobalLoading());
 
@@ -48,32 +48,14 @@ export const searchAvailableRooms = createAsyncThunk<
       // Crear repositorios
       const { roomRepository, accommodationRepository } = createRepositories();
 
-      const useCase = new SearchAvailableRooms(accommodationRepository,roomRepository);
+      const useCase = new SearchAccommodations(accommodationRepository, roomRepository);
 
       const result = await useCase.execute({
         location: params.location,
         dateRange,
       });
 
-      // ADAPTACIÓN Application → UI
-      const groupedResults = result.reduce((acc, item) => {
-      const existing = acc.find(
-        (r) => r.accommodation.id === item.accommodation.id
-      );
-
-      if (existing) {
-        existing.rooms.push(item.room);
-      } else {
-          acc.push({
-          accommodation: item.accommodation, 
-          rooms: [item.room],
-        });
-      }
-
-      return acc;
-      }, [] as SearchResult[]);
-
-      return groupedResults;
+      return result;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return rejectWithValue('Search failed. Please try again.');
@@ -94,15 +76,15 @@ const searchSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(searchAvailableRooms.pending, (state) => {
+      .addCase(searchAvailableAccomodations.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(searchAvailableRooms.fulfilled, (state, action) => {
+      .addCase(searchAvailableAccomodations.fulfilled, (state, action) => {
         state.loading = false;
         state.results = action.payload;
       })
-      .addCase(searchAvailableRooms.rejected, (state, action) => {
+      .addCase(searchAvailableAccomodations.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ?? 'Unexpected error';
       });
