@@ -23,3 +23,4 @@ const uiSlice = createSlice({
 
 export const { showGlobalLoading, hideGlobalLoading } = uiSlice.actions;
 export default uiSlice.reducer;
+export type { UIState };

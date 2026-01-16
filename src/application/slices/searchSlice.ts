@@ -99,3 +99,4 @@ const searchSlice = createSlice({
 
 export const { clearSearchResults } = searchSlice.actions;
 export default searchSlice.reducer; 
+export type { SearchState };

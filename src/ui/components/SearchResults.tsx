@@ -1,9 +1,12 @@
 "use client";
 
-import { Card, Alert, Typography, Space } from "antd";
+import { Card, Alert, Typography, Flex } from "antd";
+import { mapSearchResultToCardVM } from "../mappers/mapSearchResultToCardVM";
 import { useAppSelector } from "@/application/hooks";
+import Image from "next/image";
 
-const { Text } = Typography;
+const { Text, Link } = Typography;
+const { Meta } = Card;
 
 export function SearchResults() {
   const { results,  error } = useAppSelector(
@@ -15,16 +18,31 @@ export function SearchResults() {
   }
 
   return (
-    <Space orientation="vertical" size="large" style={{ width: '100%' }}>
-      {results.map((result) => (
-        <Card
-          key={result.id}
-          title={result.name}
-        >
-          <Text>Location: {result.location}</Text><br />
-          <Text>Price From: ${result.priceFrom.toFixed(2)} per night</Text>
-        </Card>
-      ))}
-    </Space>
+    <Flex gap="large" style={{ width: '100%' }}>
+      {results.map((result) => {
+        const card = mapSearchResultToCardVM(result);
+
+        return (
+          <Card
+            key={card.id}
+            hoverable
+            style ={{ width: 300 }}
+            cover={
+              <Image
+                draggable={false}
+                width={300}
+                height={350}
+                alt={result.name}
+                src={card.imageUrl}
+              />
+            }
+          >
+            <Meta title={<Link href="www.instagram.com" target="_blank">{card.title}</Link>} />
+            <Text>{card.location}</Text><br />
+            <Text>Price From: {card.priceLabel} per night</Text>
+          </Card>
+        )
+      })}
+    </Flex>
   );
 }
