@@ -37,7 +37,7 @@ export function SearchResults() {
               />
             }
           >
-            <Meta title={<Link href="www.instagram.com" target="_blank">{card.title}</Link>} />
+            <Meta title={<Link href={`/accommodation/${card.id}`} target="_blank">{card.title}</Link>} />
             <Text>{card.location}</Text><br />
             <Text>Price From: {card.priceLabel} per night</Text>
           </Card>
