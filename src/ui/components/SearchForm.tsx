@@ -1,29 +1,29 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { DatePicker, Button, Flex } from 'antd';
 import { LocationSearchUI } from "./LocationSearchUI";
 import { LocationSearch } from "@/domain/value-objects/LocationSearch";
-import { useAppDispatch } from '@/application/hooks';
-import { searchAvailableAccomodations } from '@/application/slices/searchSlice';
+import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
 export function SearchForm() {
-  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const params = useSearchParams();
 
-  const [location, setLocation] = useState<LocationSearch>({ city: '', country: '' });
-  const [dates, setDates] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [location, setLocation] = useState<LocationSearch>({ city: params.get("city") || '', country: params.get("country") || '' });
+  const [dates, setDates] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(params.get("from") && params.get("to") ? [dayjs(params.get("from")!), dayjs(params.get("to")!)] : null);
 
   const onSearch = () => {
     if (!dates) return;
     if (!location.city && !location.country) return;
 
-    dispatch(
-      searchAvailableAccomodations({
-        location,
-        startDate: dates[0].toISOString(),
-        endDate: dates[1].toISOString(),
-      })
+    const from = dates[0].format("YYYY-MM-DD");
+    const to = dates[1].format("YYYY-MM-DD");
+
+    router.push(
+      `/search?city=${location.city}&country=${location.country}&from=${from}&to=${to}`
     );
   };
 

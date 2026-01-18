@@ -13,6 +13,11 @@ interface SearchParams {
   endDate: string;
 }
 
+interface SearchCriteria {
+  startDate: string;
+  endDate: string;
+}
+
 interface SearchResult {
   id: string;
   name: string;
@@ -24,16 +29,18 @@ interface SearchState {
   loading: boolean;
   error: string | null;
   results: SearchResult[];
+  criteria: SearchCriteria | null;
 }
 
 const initialState: SearchState = {
   loading: false,
   error: null,
   results: [],
+  criteria: null,
 };
 
 export const searchAvailableAccomodations = createAsyncThunk<
-  SearchResult[],
+  { results: SearchResult[]; criteria: SearchCriteria },
   SearchParams,
   { rejectValue: string }
 >(
@@ -61,7 +68,13 @@ export const searchAvailableAccomodations = createAsyncThunk<
         dateRange,
       });
 
-      return result;
+      return {
+        results: result,
+        criteria: {
+          startDate: params.startDate,
+          endDate: params.endDate,
+        },
+      };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return rejectWithValue('Search failed. Please try again.');
@@ -88,7 +101,8 @@ const searchSlice = createSlice({
       })
       .addCase(searchAvailableAccomodations.fulfilled, (state, action) => {
         state.loading = false;
-        state.results = action.payload;
+        state.results = action.payload.results;
+        state.criteria = action.payload.criteria;
       })
       .addCase(searchAvailableAccomodations.rejected, (state, action) => {
         state.loading = false;

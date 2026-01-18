@@ -9,7 +9,7 @@ const { Text, Link } = Typography;
 const { Meta } = Card;
 
 export function SearchResults() {
-  const { results,  error } = useAppSelector(
+  const { results,  error, criteria } = useAppSelector(
     (state) => state.search
   );
 
@@ -36,7 +36,13 @@ export function SearchResults() {
               />
             }
           >
-            <Meta title={<Link href={`/accommodation/${card.id}`} target="_blank">{card.title}</Link>} />
+            <Meta 
+              title={<Link href={`/accommodation/${card.id}?from=${criteria?.startDate}&to=${criteria?.endDate}`} 
+              target="_blank"
+              >
+                {card.title}
+              </Link>} 
+            />
             <Text>{card.location}</Text><br />
             <Text>Price From: {card.priceLabel}</Text>
           </Card>
