@@ -14,14 +14,13 @@ export function SearchResults() {
   );
 
   if (error) {
-    return <Alert type="error" message={error} />;
+    return <Alert type="error" title={error} />;
   }
 
   return (
     <Flex gap="large" style={{ width: '100%' }}>
       {results.map((result) => {
         const card = mapSearchResultToCardVM(result);
-
         return (
           <Card
             key={card.id}
@@ -39,7 +38,7 @@ export function SearchResults() {
           >
             <Meta title={<Link href={`/accommodation/${card.id}`} target="_blank">{card.title}</Link>} />
             <Text>{card.location}</Text><br />
-            <Text>Price From: {card.priceLabel} per night</Text>
+            <Text>Price From: {card.priceLabel}</Text>
           </Card>
         )
       })}

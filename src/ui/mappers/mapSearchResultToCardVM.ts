@@ -1,9 +1,9 @@
 import { AccommodationSearchResult } from "../../domain/use-cases/dto/AccommodationSearchResult"; 
-import { AccommodationCardVM } from "../models/AccommodationCardVM";
+import { AccommodationSearchCardVM } from "../models/AccommodationSearchCardVM";
 
 export function mapSearchResultToCardVM(
   dto: AccommodationSearchResult
-): AccommodationCardVM {
+): AccommodationSearchCardVM {
   return {
     id: dto.id,
     title: dto.name,
