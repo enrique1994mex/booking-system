@@ -29,7 +29,7 @@ export function SearchForm() {
 
   return (
     <Flex gap="middle" justify="center" align="center" style={{ marginBottom: 16 }}>
-      <LocationSearchUI onSelect={(loc) => setLocation({ city: loc.name, country: loc.country })} />
+      <LocationSearchUI onSelect={setLocation} location={location} />
 
       <DatePicker.RangePicker
         size="large"
