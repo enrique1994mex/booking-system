@@ -1,9 +1,14 @@
 import { AutoComplete, Input } from "antd";
-import { useMemo, useState, useEffect } from "react";
-import { Location } from "@/domain/entities/Location";
+import { useEffect, useMemo, useState } from "react";
 import debounce from "lodash.debounce"; 
 
 export interface LocationOption {
+  city: string;
+  country: string;
+}
+
+interface LocationDTO {
+  id: string;
   city: string;
   country: string;
 }
@@ -17,11 +22,16 @@ interface AutoCompleteOption {
   key: string;
   value: string;
   label: string;
-  loc: Location;
+  loc: LocationDTO;
+}
+
+function formatLocation(city?: string, country?: string) {
+  return [city, country].filter(Boolean).join(', ');
 }
 
 export function LocationSearchUI({ onSelect, location }: LocationSearchProps) {
   const [options, setOptions] = useState<AutoCompleteOption[]>([]);
+  const [inputValue, setInputValue] = useState(location ? formatLocation(location.city, location.country) : '');
 
   const search = useMemo(
     () => 
@@ -31,35 +41,44 @@ export function LocationSearchUI({ onSelect, location }: LocationSearchProps) {
         const data = await res.json();
 
       setOptions(
-        data.map((loc: Location) => ({
+        data.map((loc: any) => ({
           key: loc.id,
           value: `${loc.name}, ${loc.country}`,
           label: `${loc.name}, ${loc.country}`,
-          loc,
+          loc: {
+            id: loc.id,
+            city: loc.name,
+            country: loc.country,
+          },
         }))
       );
     }, 300),
     []
   );
 
-  const inputValue = location
-  ? `${location.city}, ${location.country}`
-  : '';
-
   useEffect(() => {
-    if (location) {
-      search(`${location.city}`);
-    }
-  }, [location, search]);
+    return () => {
+      search.cancel();
+    };
+  }, [search]);
 
   return (
     <AutoComplete
       options={options}
       value={inputValue}
-      onSearch={search}
-      onSelect={(_, option: AutoCompleteOption) => onSelect({city: option.loc.name, country: option.loc.country})}
+      onSearch={(value) => {
+        setInputValue(value);
+        search(value);
+      }}
+      onSelect={(_, option: AutoCompleteOption) => {
+        const selected = { city: option.loc.city, country: option.loc.country };
+        const formatted = formatLocation(option.loc.city, option.loc.country);
+
+        setInputValue(formatted);
+        onSelect(selected);
+      }}
     >
       <Input placeholder="¿A dónde viajas?" size="large" />
-    </AutoComplete>
+    </AutoComplete> 
   );
 }

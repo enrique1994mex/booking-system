@@ -1,7 +1,7 @@
 import { AccommodationRepository } from "@/domain/repositories/AccommodationRepository";
 import { Accommodation } from "@/domain/entities/Accommodation";
 import { accommodations } from "../data/accommodations";
-import { LocationSearch } from "@/domain/value-objects/LocationSearch";
+import { LocationSearch } from "@/domain/use-cases/dto/LocationSearch";
 
 export class MockAccommodationRepository implements AccommodationRepository {
   async findAll(): Promise<Accommodation[]> {

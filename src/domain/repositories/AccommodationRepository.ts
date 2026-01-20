@@ -1,5 +1,5 @@
 import { Accommodation } from "../entities/Accommodation";
-import { LocationSearch } from "../value-objects/LocationSearch";
+import { LocationSearch } from "../use-cases/dto/LocationSearch";
 
 export interface AccommodationRepository {
   findAll(): Promise<Accommodation[]>;

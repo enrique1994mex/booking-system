@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { SearchAccommodations } from '@/domain/use-cases/SearchAccommodations';
-import { DateRange } from '@/domain/value-objects/DateRange';
-import { createRepositories } from '@/infrastructure/factories/createRepositories';
+import { searchAccommodationsService } from '../services/SearchService';
 import { hideGlobalLoading, showGlobalLoading } from './uiSlice';
 
 interface SearchParams {
@@ -49,24 +47,13 @@ export const searchAvailableAccomodations = createAsyncThunk<
     dispatch(showGlobalLoading());
 
     try {
-      // Crear rangos de fechas
-      const dateRange = new DateRange(
-        new Date(params.startDate),
-        new Date(params.endDate)
+
+      // Service call to search accommodations
+      const result = await searchAccommodationsService(
+        { city: params.location.city, country: params.location.country },
+        params.startDate,
+        params.endDate
       );
-
-      // Crear repositorios
-      const { roomRepository, accommodationRepository } = createRepositories();
-
-      const useCase = new SearchAccommodations(accommodationRepository, roomRepository);
-
-      const result = await useCase.execute({
-        location: {
-          city: params.location.city,
-          country: params.location.country,
-        },
-        dateRange,
-      });
 
       return {
         results: result,

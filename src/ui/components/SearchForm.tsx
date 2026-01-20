@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { DatePicker, Button, Flex } from 'antd';
 import { LocationSearchUI } from "./LocationSearchUI";
-import { LocationSearch } from "@/domain/value-objects/LocationSearch";
+import { LocationSearch } from "@/domain/use-cases/dto/LocationSearch";
 import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
