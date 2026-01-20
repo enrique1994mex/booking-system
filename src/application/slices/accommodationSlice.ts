@@ -1,10 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { GetAccommodationAvailability } from '@/domain/use-cases/GetAccommodationAvailability';
-import { hideGlobalLoading, showGlobalLoading } from './uiSlice';
-import { DateRange } from '@/domain/value-objects/DateRange'; 
+import { hideGlobalLoading, showGlobalLoading } from './uiSlice'; 
 import { AccommodationCardVM } from '@/ui/models/AccommodationCardVM';
 import { mapAccommodationVM } from '@/ui/mappers/mapAccommodationVM';
-import { createRepositories } from '@/infrastructure/factories/createRepositories';
+import { getAccommodationAvailabilityService } from '../services/AccommodationService';
 
 interface AccommodationState {
   loading: boolean;
@@ -27,22 +25,12 @@ export const getAccommodationAvailability = createAsyncThunk<
     dispatch(showGlobalLoading());
 
     try {
-      const dateRange = new DateRange(
-        new Date(params.startDate),
-        new Date(params.endDate)
+      // Service call to get accommodation availability
+      const result = await getAccommodationAvailabilityService(
+        params.accommodationId,
+        params.startDate,
+        params.endDate
       );
-
-      const { roomRepository, accommodationRepository } = createRepositories();
-
-      const useCase = new GetAccommodationAvailability(
-        roomRepository,
-        accommodationRepository,
-      );
-
-      const result = await useCase.execute({
-        accommodationId: params.accommodationId,
-        dateRange,
-      });
 
       const vm = mapAccommodationVM(result);
 
