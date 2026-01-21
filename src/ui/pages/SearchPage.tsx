@@ -1,5 +1,5 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useAppDispatch } from "@/application/hooks";
 import { searchAvailableAccomodations } from "@/application/slices/searchSlice";
@@ -7,14 +7,17 @@ import { SearchForm } from "../components/SearchForm";
 import { SearchResults } from "../components/SearchResults";
 import { SearchLayout } from "../layouts/SearchLayout";
 
-export function SearchPage() {
-  const params = useSearchParams();
+interface Props {
+  searchParams: ReadonlyURLSearchParams;
+}
+
+export function SearchPage({ searchParams }: Props) {
   const dispatch = useAppDispatch();
 
-  const city = params.get("city");
-  const country = params.get("country");
-  const from = params.get("from");
-  const to = params.get("to");
+  const city = searchParams.get("city");
+  const country = searchParams.get("country");
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
 
   useEffect(() => {
     if (!from || !to || (!city && !country)) return;
