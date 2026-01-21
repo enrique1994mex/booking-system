@@ -7,6 +7,12 @@ export interface LocationOption {
   country: string;
 }
 
+interface LocationApiResponse {
+  id: string;
+  name: string;
+  country: string;
+}
+
 interface LocationDTO {
   id: string;
   city: string;
@@ -38,10 +44,10 @@ export function LocationSearchUI({ onSelect, location }: LocationSearchProps) {
       debounce(async (value: string) => {
         if (!value) return;
         const res = await fetch(`/api/locations?q=${value}`);
-        const data = await res.json();
+        const data: LocationApiResponse[] = await res.json();
 
       setOptions(
-        data.map((loc: any) => ({
+        data.map((loc) => ({
           key: loc.id,
           value: `${loc.name}, ${loc.country}`,
           label: `${loc.name}, ${loc.country}`,
