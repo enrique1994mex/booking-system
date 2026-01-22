@@ -1,9 +1,5 @@
-"use client";
-
+import { HomeButton } from "../components/HomeButton";
 
 export function HomePage() {
-  return (
-    <>
-    </>
-  );
+  return <HomeButton /> 
 }
