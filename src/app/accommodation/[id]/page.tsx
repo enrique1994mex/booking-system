@@ -1,12 +1,10 @@
-import { AccommodationPage } from "@/ui/pages/AccommodationPage";
+import { Suspense } from "react";
+import AccommodationClient from "./AccommodationClient";
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default async function Page({ params }: PageProps) {
-  const { id } = await params;
-  return <AccommodationPage id={id} />; 
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading search...</div>}>
+      <AccommodationClient />
+    </Suspense>
+  );
 }
