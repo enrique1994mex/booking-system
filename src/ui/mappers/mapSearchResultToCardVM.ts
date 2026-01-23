@@ -7,7 +7,7 @@ export function mapSearchResultToCardVM(
   return {
     id: dto.id,
     title: dto.name,
-    location: dto.location,
+    location: `${dto.location}, view on map`,
     priceLabel: `$${dto.priceFrom.toFixed(2)} per night`,
     imageUrl: `/images/hotel_1.jpg`,
   };

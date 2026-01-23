@@ -5,7 +5,7 @@ import { mapSearchResultToCardVM } from "../mappers/mapSearchResultToCardVM";
 import { useAppSelector } from "@/application/hooks";
 import Image from "next/image";
 
-const { Text, Link } = Typography;
+const { Link, Title, Paragraph } = Typography;
 const { Meta } = Card;
 
 export function SearchResults() {
@@ -40,11 +40,17 @@ export function SearchResults() {
               title={<Link href={`/accommodation/${card.id}?from=${criteria?.startDate}&to=${criteria?.endDate}`} 
               target="_blank"
               >
-                {card.title}
+                <Title level={4}>{card.title}</Title>
               </Link>} 
             />
-            <Text>{card.location}</Text><br />
-            <Text>Price From: {card.priceLabel}</Text>
+            <Link 
+              href={`/accommodation/${card.id}?from=${criteria?.startDate}&to=${criteria?.endDate}`} 
+              target="_blank"
+              underline
+            >
+                {card.location}
+            </Link>
+            <Paragraph>Price From: {card.priceLabel}</Paragraph>
           </Card>
         )
       })}
