@@ -18,10 +18,11 @@ const initialState: AccommodationState = {
 
 export const getAccommodationAvailability = createAsyncThunk<
   AccommodationCardVM,
-  { accommodationId: string; startDate: string; endDate: string }
+  { accommodationId: string; startDate: string; endDate: string },
+  { rejectValue: string }
 >(
   'accommodation/getAvailability',
-  async (params, { dispatch }) => {
+  async (params, { dispatch, rejectWithValue }) => {
     dispatch(showGlobalLoading());
 
     try {
@@ -35,6 +36,8 @@ export const getAccommodationAvailability = createAsyncThunk<
       const vm = mapAccommodationVM(result);
 
       return vm;
+    } catch (e) {
+      return rejectWithValue("Accommodation not available");
     } finally {
       dispatch(hideGlobalLoading());
     }
@@ -48,7 +51,6 @@ const accommodationSlice = createSlice({
     clearAccommodation(state) {
       state.data = null;
       state.error = null;
-      state.loading = false;
     },
   },
   extraReducers: (builder) => {
@@ -60,9 +62,9 @@ const accommodationSlice = createSlice({
         state.loading = false;
         state.data = action.payload;
       })
-      .addCase(getAccommodationAvailability.rejected, (state) => {
+      .addCase(getAccommodationAvailability.rejected, (state, action) => {
         state.loading = false;
-        state.error = 'Failed loading accommodation';
+        state.error = action.payload ?? "Unexpected error";
       });
   },
 });
