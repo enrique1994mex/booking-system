@@ -1,5 +1,219 @@
 "use client";
 
+import { Alert, Button, Card, Divider, Empty, Flex, Typography, } from "antd";
+import { CalendarOutlined, CheckCircleOutlined, EnvironmentOutlined, HomeOutlined, TeamOutlined, UserOutlined, } from "@ant-design/icons";
+import { useAppSelector } from "@/application/hooks";
+
+const { Title, Text } = Typography;
+
+
 export function Booking() {
-  return <div>Booking Page</div>;
+  const { data, error } = useAppSelector((state) => state.booking);
+
+  if (error) {
+    return <Alert type="error" title={error} showIcon />;
+  }
+
+  if (!data) {
+    return <Empty description="No booking information available" />;
+  }
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+
+  return (
+    <Flex
+      vertical
+      gap="middle"
+      justify="center"
+      align="center"
+      style={{ width: "100%", padding: "24px 0" }}
+    >
+      <Card
+        style={{ width: 500, borderRadius: 8 }}
+        styles={{
+          header: {
+            backgroundColor: "#003580",
+            color: "#fff",
+            borderRadius: "8px 8px 0 0",
+          },
+        }}
+        title={
+          <Flex align="center" gap="small">
+            <CheckCircleOutlined style={{ color: "#fff", fontSize: 20 }} />
+            <Text strong style={{ color: "#fff", fontSize: 18 }}>
+              Booking Summary
+            </Text>
+          </Flex>
+        }
+      >
+        {/* Accommodation Info */}
+        <Flex vertical gap="small" style={{ marginBottom: 16 }}>
+          <Flex align="center" gap="small">
+            <HomeOutlined style={{ color: "#003580", fontSize: 18 }} />
+            <Title level={5} style={{ margin: 0 }}>
+              {data.accommodation.name}
+            </Title>
+          </Flex>
+          <Flex align="center" gap="small" style={{ marginLeft: 26 }}>
+            <EnvironmentOutlined style={{ color: "#6b6b6b" }} />
+            <Text type="secondary">
+              {data.accommodation.city}, {data.accommodation.country}
+            </Text>
+          </Flex>
+        </Flex>
+
+        <Divider style={{ margin: "16px 0" }} />
+
+        {/* Room Info */}
+        <Flex vertical gap="small" style={{ marginBottom: 16 }}>
+          <Text strong style={{ color: "#003580" }}>
+            Room Details
+          </Text>
+          <Flex
+            justify="space-between"
+            align="center"
+            style={{
+              backgroundColor: "#f5f5f5",
+              padding: "12px 16px",
+              borderRadius: 6,
+            }}
+          >
+            <Flex vertical gap={4}>
+              <Text strong>{data.room.type}</Text>
+              <Flex align="center" gap="small">
+                <TeamOutlined style={{ color: "#6b6b6b" }} />
+                <Text type="secondary">
+                  {data.room.capacity}{" "}
+                  {data.room.capacity === 1 ? "Guest" : "Guests"}
+                </Text>
+              </Flex>
+            </Flex>
+            <Text strong style={{ color: "#003580", fontSize: 16 }}>
+              {formatCurrency(data.room.pricePerNight)}
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                /night
+              </Text>
+            </Text>
+          </Flex>
+        </Flex>
+
+        <Divider style={{ margin: "16px 0" }} />
+
+        {/* Stay Dates */}
+        <Flex vertical gap="small" style={{ marginBottom: 16 }}>
+          <Text strong style={{ color: "#003580" }}>
+            Your Stay
+          </Text>
+          <Flex
+            gap="large"
+            style={{
+              backgroundColor: "#f5f5f5",
+              padding: "12px 16px",
+              borderRadius: 6,
+            }}
+          >
+            <Flex vertical gap={4}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                CHECK-IN
+              </Text>
+              <Flex align="center" gap="small">
+                <CalendarOutlined style={{ color: "#003580" }} />
+                <Text strong>{formatDate(data.stay.from)}</Text>
+              </Flex>
+            </Flex>
+            <Flex vertical gap={4}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                CHECK-OUT
+              </Text>
+              <Flex align="center" gap="small">
+                <CalendarOutlined style={{ color: "#003580" }} />
+                <Text strong>{formatDate(data.stay.to)}</Text>
+              </Flex>
+            </Flex>
+          </Flex>
+          <Flex align="center" gap="small" style={{ marginTop: 4 }}>
+            <UserOutlined style={{ color: "#6b6b6b" }} />
+            <Text type="secondary">
+              {data.stay.nights} {data.stay.nights === 1 ? "night" : "nights"}
+            </Text>
+          </Flex>
+        </Flex>
+
+        <Divider style={{ margin: "16px 0" }} />
+
+        {/* Price Summary */}
+        <Flex vertical gap="small">
+          <Text strong style={{ color: "#003580" }}>
+            Price Details
+          </Text>
+          <Flex justify="space-between">
+            <Text type="secondary">
+              {formatCurrency(data.room.pricePerNight)} x {data.stay.nights}{" "}
+              {data.stay.nights === 1 ? "night" : "nights"}
+            </Text>
+            <Text>{formatCurrency(data.stay.totalPrice)}</Text>
+          </Flex>
+          <Divider style={{ margin: "8px 0" }} />
+          <Flex
+            justify="space-between"
+            style={{
+              backgroundColor: "#e8f4f8",
+              padding: "12px 16px",
+              borderRadius: 6,
+              marginTop: 8,
+            }}
+          >
+            <Text strong style={{ fontSize: 16 }}>
+              Total
+            </Text>
+            <Text strong style={{ fontSize: 20, color: "#003580" }}>
+              {formatCurrency(data.stay.totalPrice)}
+            </Text>
+          </Flex>
+        </Flex>
+
+        {/* Confirm Button */}
+        <Button
+          type="primary"
+          size="large"
+          block
+          style={{
+            marginTop: 24,
+            height: 48,
+            backgroundColor: "#0071c2",
+            fontWeight: 600,
+          }}
+        >
+          Confirm Booking
+        </Button>
+
+        <Text
+          type="secondary"
+          style={{
+            display: "block",
+            textAlign: "center",
+            marginTop: 12,
+            fontSize: 12,
+          }}
+        >
+          You will not be charged yet
+        </Text>
+      </Card>
+    </Flex>
+  );
 }
