@@ -3,6 +3,8 @@
 import { Alert, Card, Empty, Flex, Typography } from "antd";
 import { useAppSelector } from "@/application/hooks";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { RoomsTable } from "./RoomsTable";
 import { AccommodationCardVM } from "../models/AccommodationCardVM";
 
@@ -15,6 +17,9 @@ export function Accommodation () {
     (state) => state.accommodation
   );
 
+  const router = useRouter();
+  const params = useSearchParams();
+
   if (error) {
     return <Alert type="error" title={error} />;
   }
@@ -22,7 +27,7 @@ export function Accommodation () {
   if (!data) return <Empty description="No rooms available" />;
 
   const handleBook = (room: RoomRow) => {
-    console.log("Booking room:", room.id);
+    router.push(`/booking?roomId=${room.id}&from=${params.get("from")}&to=${params.get("to")}`);
   };
 
   return (

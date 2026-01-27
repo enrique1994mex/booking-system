@@ -35,7 +35,7 @@ export function RoomsTable({ rooms, onBook }: RoomsTableProps) {
       title: "Action",
       key: "action",
       render: (_, room) => (
-        <Button type="primary" onClick={() => onBook(room)}>
+        <Button type="primary" onClick={() => onBook(room)} target="_blank">
           Booking
         </Button>
       ),
