@@ -53,23 +53,37 @@ export const getRoomDetail = createAsyncThunk<
 export const confirmBooking = createAsyncThunk<
   BookingResultVM,
   {
-    roomId: string;
     userId: string;
-    dateRange: {
-      from: string;
-      to: string;
-    };
   },
-  { rejectValue: string }
+  { 
+    state: { booking: BookingState };
+    rejectValue: string 
+  }
 >(
   "booking/confirmBooking",
-  async (params, { dispatch, rejectWithValue }) => {
+  async ({ userId }, { dispatch, getState, rejectWithValue }) => {
     dispatch(showGlobalLoading());
 
     try {
-      const booking = await createBookingService(params);
+      const state = getState(); 
+      const preview = state.booking.preview;
 
-      const vm = mapBookingResultVM(booking);
+      if (!preview) {
+        return rejectWithValue("Booking preview not found");
+      }
+
+      // Build domain input
+      const booking = await createBookingService({
+        userId,
+        roomId: preview.roomId,
+        dateRange: {
+          from: preview.stay.from,
+          to: preview.stay.to,
+        },
+      });
+
+      // Map to UI model using preview context
+      const vm = mapBookingResultVM(booking, preview);
 
       return vm;
     } catch (error) {

@@ -1,10 +1,24 @@
 export interface BookingResultVM {
-  id: string;
+  bookingId: string;
   status: string;
-  roomId: string;
+  accommodation: {
+    id: string;
+    name: string;
+    city: string;
+    country: string;
+  };
+  room: {
+    id: string;
+    type: string;
+    capacity: number;
+    pricePerNight: number;
+  };
+  stay: {
+    from: string;
+    to: string;
+    nights: number;
+    totalPrice: number;
+    currency: string;
+  };
   userId: string;
-  from: string;
-  to: string;
-  totalPrice: number;
-  currency: string;
 }

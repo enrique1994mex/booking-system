@@ -1,15 +1,30 @@
 import { Booking } from "@/domain/entities/Booking";
+import { BookingPreviewVM } from "../models/BookingPreviewVM";
 import { BookingResultVM } from "../models/BookingResultVM";
 
-export function mapBookingResultVM(booking: Booking): BookingResultVM {
-  return {
-    id: booking.id,
+export function mapBookingResultVM(booking: Booking, preview: BookingPreviewVM): BookingResultVM {
+   return {
+    bookingId: booking.id,
     status: booking.status,
-    roomId: booking.roomId,
     userId: booking.userId,
-    from: booking.dateRange.startDate.toISOString().split("T")[0],
-    to: booking.dateRange.endDate.toISOString().split("T")[0],
-    totalPrice: booking.totalPrice.amount,
-    currency: booking.totalPrice.currency,
+    accommodation: {
+      id: preview.accommodation.id,
+      name: preview.accommodation.name,
+      city: preview.accommodation.city,
+      country: preview.accommodation.country,
+    },
+    room: {
+      id: booking.roomId,
+      type: preview.room.type,
+      capacity: preview.room.capacity,
+      pricePerNight: preview.room.pricePerNight,
+    },
+    stay: {
+      from: preview.stay.from,
+      to: preview.stay.to,
+      nights: preview.stay.nights,
+      totalPrice: booking.totalPrice.amount,
+      currency: booking.totalPrice.currency,
+    },
   };
 }

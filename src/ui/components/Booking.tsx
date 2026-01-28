@@ -46,17 +46,12 @@ export function Booking() {
     try {
       const resultAction = await dispatch(
         confirmBooking({
-          roomId: preview.roomId,
           userId: "demo-user-1", // luego vendrá de auth
-          dateRange: {
-            from: preview.stay.from,
-            to: preview.stay.to,
-          },
         })
       );
 
       if (confirmBooking.fulfilled.match(resultAction)) {
-        router.push("/booking/result");
+        router.push("/booking/success");
       }
     } catch (error) {
       console.error(error);
