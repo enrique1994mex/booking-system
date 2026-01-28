@@ -17,6 +17,13 @@ export class CreateBooking {
   }): Promise<Booking> {
     const { userId, roomId, dateRange } = input;
 
+    // Obtener habitación
+    const room = await this.roomRepository.findById(roomId);
+
+    if (!room) {
+      throw new Error('Room not found');
+    }
+
     // Verificar la disponibilidad de la habitación
     const existingBookings = await this.bookingRepository.findByRoomId(roomId);
 
@@ -26,18 +33,6 @@ export class CreateBooking {
 
     if (isOverlapping) {
       throw new Error('Room is not available for the selected dates');
-    }
-
-    // Obtener habitación
-    const rooms = await this.roomRepository.findAvailableRooms(
-      '', // no necesitamos accommodation aquí
-      dateRange
-    );
-
-    const room = rooms.find(r => r.id === roomId);
-
-    if (!room) {
-      throw new Error('Room not found');
     }
 
      // Calcular precio

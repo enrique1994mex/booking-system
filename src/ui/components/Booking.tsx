@@ -2,19 +2,24 @@
 
 import { Alert, Button, Card, Divider, Empty, Flex, Typography, } from "antd";
 import { CalendarOutlined, CheckCircleOutlined, EnvironmentOutlined, HomeOutlined, TeamOutlined, UserOutlined, } from "@ant-design/icons";
-import { useAppSelector } from "@/application/hooks";
+import { useAppSelector, useAppDispatch } from "@/application/hooks";
+import { confirmBooking } from "@/application/slices/bookingSlice";
+import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
 
 
 export function Booking() {
-  const { data, error } = useAppSelector((state) => state.booking);
+  const { preview, error, status } = useAppSelector((state) => state.booking);
+
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
   if (error) {
     return <Alert type="error" title={error} showIcon />;
   }
 
-  if (!data) {
+  if (!preview) {
     return <Empty description="No booking information available" />;
   }
 
@@ -33,6 +38,29 @@ export function Booking() {
       style: "currency",
       currency: "USD",
     }).format(amount);
+  };
+
+  const handleConfirm = async () => {
+  if (!preview) return;
+
+    try {
+      const resultAction = await dispatch(
+        confirmBooking({
+          roomId: preview.roomId,
+          userId: "demo-user-1", // luego vendrá de auth
+          dateRange: {
+            from: preview.stay.from,
+            to: preview.stay.to,
+          },
+        })
+      );
+
+      if (confirmBooking.fulfilled.match(resultAction)) {
+        router.push("/booking/result");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -66,13 +94,13 @@ export function Booking() {
           <Flex align="center" gap="small">
             <HomeOutlined style={{ color: "#003580", fontSize: 18 }} />
             <Title level={5} style={{ margin: 0 }}>
-              {data.accommodation.name}
+              {preview.accommodation.name}
             </Title>
           </Flex>
           <Flex align="center" gap="small" style={{ marginLeft: 26 }}>
             <EnvironmentOutlined style={{ color: "#6b6b6b" }} />
             <Text type="secondary">
-              {data.accommodation.city}, {data.accommodation.country}
+              {preview.accommodation.city}, {preview.accommodation.country}
             </Text>
           </Flex>
         </Flex>
@@ -94,17 +122,17 @@ export function Booking() {
             }}
           >
             <Flex vertical gap={4}>
-              <Text strong>{data.room.type}</Text>
+              <Text strong>{preview.room.type}</Text>
               <Flex align="center" gap="small">
                 <TeamOutlined style={{ color: "#6b6b6b" }} />
                 <Text type="secondary">
-                  {data.room.capacity}{" "}
-                  {data.room.capacity === 1 ? "Guest" : "Guests"}
+                  {preview.room.capacity}{" "}
+                  {preview.room.capacity === 1 ? "Guest" : "Guests"}
                 </Text>
               </Flex>
             </Flex>
             <Text strong style={{ color: "#003580", fontSize: 16 }}>
-              {formatCurrency(data.room.pricePerNight)}
+              {formatCurrency(preview.room.pricePerNight)}
               <Text type="secondary" style={{ fontSize: 12 }}>
                 /night
               </Text>
@@ -133,7 +161,7 @@ export function Booking() {
               </Text>
               <Flex align="center" gap="small">
                 <CalendarOutlined style={{ color: "#003580" }} />
-                <Text strong>{formatDate(data.stay.from)}</Text>
+                <Text strong>{formatDate(preview.stay.from)}</Text>
               </Flex>
             </Flex>
             <Flex vertical gap={4}>
@@ -142,14 +170,14 @@ export function Booking() {
               </Text>
               <Flex align="center" gap="small">
                 <CalendarOutlined style={{ color: "#003580" }} />
-                <Text strong>{formatDate(data.stay.to)}</Text>
+                <Text strong>{formatDate(preview.stay.to)}</Text>
               </Flex>
             </Flex>
           </Flex>
           <Flex align="center" gap="small" style={{ marginTop: 4 }}>
             <UserOutlined style={{ color: "#6b6b6b" }} />
             <Text type="secondary">
-              {data.stay.nights} {data.stay.nights === 1 ? "night" : "nights"}
+              {preview.stay.nights} {preview.stay.nights === 1 ? "night" : "nights"}
             </Text>
           </Flex>
         </Flex>
@@ -163,10 +191,10 @@ export function Booking() {
           </Text>
           <Flex justify="space-between">
             <Text type="secondary">
-              {formatCurrency(data.room.pricePerNight)} x {data.stay.nights}{" "}
-              {data.stay.nights === 1 ? "night" : "nights"}
+              {formatCurrency(preview.room.pricePerNight)} x {preview.stay.nights}{" "}
+              {preview.stay.nights === 1 ? "night" : "nights"}
             </Text>
-            <Text>{formatCurrency(data.stay.totalPrice)}</Text>
+            <Text>{formatCurrency(preview.stay.totalPrice)}</Text>
           </Flex>
           <Divider style={{ margin: "8px 0" }} />
           <Flex
@@ -182,7 +210,7 @@ export function Booking() {
               Total
             </Text>
             <Text strong style={{ fontSize: 20, color: "#003580" }}>
-              {formatCurrency(data.stay.totalPrice)}
+              {formatCurrency(preview.stay.totalPrice)}
             </Text>
           </Flex>
         </Flex>
@@ -192,6 +220,9 @@ export function Booking() {
           type="primary"
           size="large"
           block
+          loading={status === "confirming"}
+          disabled={status === "confirming"}
+          onClick={handleConfirm}
           style={{
             marginTop: 24,
             height: 48,
