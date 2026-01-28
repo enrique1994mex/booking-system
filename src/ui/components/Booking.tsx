@@ -15,13 +15,21 @@ export function Booking() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  const isConfirming = status === "confirming";
+  const isReady = status === "readyToConfirm";
+
   if (error) {
     return <Alert type="error" title={error} showIcon />;
   }
 
-  if (!preview) {
+  if (status === "loadingPreview") {
+    return <Card loading style={{ width: 500 }} />;
+  }
+
+  if (!preview || !isReady) {
     return <Empty description="No booking information available" />;
   }
+
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -41,19 +49,22 @@ export function Booking() {
   };
 
   const handleConfirm = async () => {
-  if (!preview) return;
+  if (!preview || isConfirming) return;
 
     try {
       const resultAction = await dispatch(
         confirmBooking({
           userId: "demo-user-1", // luego vendrá de auth
+          roomId: preview.roomId,
+          from: preview.stay.from,
+          to: preview.stay.to,
         })
       );
 
       if (confirmBooking.fulfilled.match(resultAction)) {
         router.push("/booking/success");
       }
-    } catch (error) {
+    } catch (error) { 
       console.error(error);
     }
   };
@@ -215,8 +226,8 @@ export function Booking() {
           type="primary"
           size="large"
           block
-          loading={status === "confirming"}
-          disabled={status === "confirming"}
+          loading={isConfirming}
+          disabled={isConfirming}
           onClick={handleConfirm}
           style={{
             marginTop: 24,
