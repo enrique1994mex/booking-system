@@ -1,6 +1,5 @@
 import { CreateBooking } from "@/domain/use-cases/CreateBooking";
-import { MockBookingRepository } from "@/infrastructure/repositories/MockBookingRepository";
-import { MockRoomRepository } from "@/infrastructure/repositories/MockRoomRepository";
+import { createRepositories } from "@/infrastructure/factories/createRepositories";
 import { DateRange } from "@/domain/value-objects/DateRange";
 
 export async function createBookingService(params: {
@@ -8,8 +7,7 @@ export async function createBookingService(params: {
   roomId: string;
   dateRange: { from: string; to: string };
 }) {
-  const bookingRepository = new MockBookingRepository();
-  const roomRepository = new MockRoomRepository();
+  const { bookingRepository, roomRepository } = createRepositories();
 
   const useCase = new CreateBooking(
     bookingRepository,
