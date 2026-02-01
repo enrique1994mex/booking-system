@@ -11,16 +11,19 @@ interface BookingRow {
   room_id: string;
   from_date: string;
   to_date: string;
+  total_amount: number;
+  currency: string;
 }
 
 export class SupabaseBookingRepository implements BookingRepository {
 
   async save(booking: Booking): Promise<void> {
-    const { error } = await supabase.from("bookings").insert({
-      user_id: booking.userId,
-      room_id: booking.roomId,
-      from_date: booking.dateRange.startDate,
-      to_date: booking.dateRange.endDate,
+
+    const { error } = await supabase.rpc("create_booking_atomic", {
+      p_user_id: booking.userId,
+      p_room_id: Number(booking.roomId),
+      p_from: booking.dateRange.startDate.toISOString().split("T")[0],
+      p_to: booking.dateRange.endDate.toISOString().split("T")[0],
     });
 
     if (error) throw error;
@@ -50,7 +53,7 @@ export class SupabaseBookingRepository implements BookingRepository {
       userId: row.user_id,
       roomId: row.room_id,
       dateRange: new DateRange(new Date(row.from_date), new Date(row.to_date)),
-      totalPrice: new Money(0), 
+      totalPrice: new Money(row.total_amount, row.currency),
       status: BookingStatus.CONFIRMED,
     };
   }
