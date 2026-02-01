@@ -37,6 +37,7 @@ export const getAccommodationAvailability = createAsyncThunk<
 
       return vm;
     } catch (e) {
+      console.error('Accommodation availability error:', e);
       return rejectWithValue("Accommodation not available");
     } finally {
       dispatch(hideGlobalLoading());

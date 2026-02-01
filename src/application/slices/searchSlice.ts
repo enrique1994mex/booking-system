@@ -62,8 +62,9 @@ export const searchAvailableAccomodations = createAsyncThunk<
           endDate: params.endDate,
         },
       };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     } catch (e) {
+      console.error('Search error:', e);
       return rejectWithValue('Search failed. Please try again.');
     } finally {
       dispatch(hideGlobalLoading());
