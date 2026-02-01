@@ -6,18 +6,13 @@ export function mapBookingPreviewVM(
   dateRange: { from: string; to: string }
 ): BookingPreviewVM {
 
-  const nights = data.room.pricePerNight
-    ? data.room.pricePerNight && data.room.pricePerNight > 0
-      ? data.room.pricePerNight // placeholder, real calculation comes later
-      : 0
-    : 0;
+  const from = new Date(dateRange.from);
+  const to = new Date(dateRange.to);
 
-  const numberOfNights = data.room.pricePerNight
-    ? Math.max(1, data.room.pricePerNight / data.room.pricePerNight)
-    : 1;
+  const diffMs = to.getTime() - from.getTime();
+  const numberOfNights = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-  const totalPrice =
-    data.room.pricePerNight * numberOfNights;
+  const totalPrice = data.room.pricePerNight * numberOfNights;
 
   return {
     roomId: data.room.id,

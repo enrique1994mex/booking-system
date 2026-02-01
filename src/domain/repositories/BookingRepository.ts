@@ -1,7 +1,12 @@
 import { Booking } from "../entities/Booking";
+import { DateRange } from "../value-objects/DateRange";
 
 export interface BookingRepository {
-  save(booking: Booking): Promise<void>;
+  create(input: {
+    userId: string;
+    roomId: string;
+    dateRange: DateRange;
+  }): Promise<Booking>;
   findByUserId(userId: string): Promise<Booking[]>;
   findByRoomId(roomId: string): Promise<Booking[]>;
 }

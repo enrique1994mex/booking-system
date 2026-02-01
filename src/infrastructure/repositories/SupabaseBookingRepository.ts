@@ -17,16 +17,44 @@ interface BookingRow {
 
 export class SupabaseBookingRepository implements BookingRepository {
 
-  async save(booking: Booking): Promise<void> {
+  async create(input: {
+    userId: string;
+    roomId: string;
+    dateRange: DateRange;
+  }): Promise<Booking> {
 
-    const { error } = await supabase.rpc("create_booking_atomic", {
-      p_user_id: booking.userId,
-      p_room_id: Number(booking.roomId),
-      p_from: booking.dateRange.startDate.toISOString().split("T")[0],
-      p_to: booking.dateRange.endDate.toISOString().split("T")[0],
-    });
+    const { data, error } = await supabase.rpc("create_booking_atomic",
+      {
+        p_user_id: input.userId,
+        p_room_id: Number(input.roomId),
+        p_from: input.dateRange.startDate.toISOString().split("T")[0],
+        p_to: input.dateRange.endDate.toISOString().split("T")[0],
+      }
+    );
 
-    if (error) throw error;
+    if (error) {
+      console.error("RPC error:", error);
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error("Room is not available for selected dates");
+    }
+
+    // Normalizamos: Supabase puede devolver objeto o array
+    const row = Array.isArray(data) ? data[0] : data;
+
+    return {
+      id: row.id,
+      userId: row.user_id,
+      roomId: row.room_id.toString(),
+      dateRange: new DateRange(
+        new Date(row.from_date),
+        new Date(row.to_date)
+      ),
+      totalPrice: new Money(Number(row.total_amount), row.currency),
+      status: row.status,
+    };
   }
 
   async findByUserId(userId: string): Promise<Booking[]> {

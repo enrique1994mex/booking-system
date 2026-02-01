@@ -67,16 +67,11 @@ export const confirmBooking = createAsyncThunk<
   }
 >(
   "booking/confirmBooking",
-  async (payload, { getState, rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const { booking } = getState();
-      const preview = booking.preview;
-
-      if (!preview) {
-        return rejectWithValue("Booking preview not found");
-      }
-
-      const bookingResult = await createBookingService({
+      
+      // Service call to create booking
+      const booking = await createBookingService({
         userId: payload.userId,
         roomId: payload.roomId,
         dateRange: {
@@ -85,7 +80,7 @@ export const confirmBooking = createAsyncThunk<
         },
       });
       // TEMPORAL: usamos preview snapshot para mostrar resumen final
-      const vm = mapBookingResultVM(bookingResult, preview);
+      const vm = mapBookingResultVM(booking); 
 
       return vm;
     } catch (error) {
