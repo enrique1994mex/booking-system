@@ -1,4 +1,4 @@
-import { supabase } from "@/infrastructure/db/supabaseClient";
+import { getSupabaseClient } from "@/infrastructure/db/supabaseClient";
 import { BookingQueryRepository } from "@/domain/repositories/BookingQueryRepository";
 import { BookingConfirmation } from "@/domain/read-models/BookingConfirmation";
 
@@ -8,7 +8,7 @@ export class SupabaseBookingQueryRepository implements BookingQueryRepository {
     bookingId: string
   ): Promise<BookingConfirmation> {
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from("booking_confirmations_view")
       .select("*")
       .eq("booking_id", bookingId)

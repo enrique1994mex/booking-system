@@ -1,4 +1,4 @@
-import { supabase } from "@/infrastructure/db/supabaseClient";
+import { getSupabaseClient  } from "@/infrastructure/db/supabaseClient";
 import { AccommodationRepository } from "@/domain/repositories/AccommodationRepository";
 import { Accommodation } from "@/domain/entities/Accommodation";
 import { LocationSearch } from "@/domain/use-cases/dto/LocationSearch";
@@ -16,7 +16,7 @@ interface AccommodationRow {
 export class SupabaseAccommodationRepository implements AccommodationRepository {
 
   async findAll(): Promise<Accommodation[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient() 
       .from("accommodations")
       .select("*");
 
@@ -26,7 +26,7 @@ export class SupabaseAccommodationRepository implements AccommodationRepository 
   }
 
   async findById(id: string): Promise<Accommodation | null> {
-    const { data } = await supabase
+    const { data } = await getSupabaseClient() 
       .from("accommodations")
       .select("*")
       .eq("id", id)
@@ -36,7 +36,7 @@ export class SupabaseAccommodationRepository implements AccommodationRepository 
   }
 
   async searchByLocation(search: LocationSearch): Promise<Accommodation[]> {
-    let query = supabase.from("accommodations").select("*");
+    let query = getSupabaseClient().from("accommodations").select("*");
 
     if (search.city) {
       query = query.ilike("city", `%${search.city}%`);

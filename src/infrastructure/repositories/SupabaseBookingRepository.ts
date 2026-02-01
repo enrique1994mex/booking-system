@@ -1,4 +1,4 @@
-import { supabase } from "@/infrastructure/db/supabaseClient";
+import { getSupabaseClient } from "@/infrastructure/db/supabaseClient";
 import { BookingRepository } from "@/domain/repositories/BookingRepository";
 import { Booking } from "@/domain/entities/Booking";
 import { BookingStatus } from "@/domain/entities/Booking";
@@ -23,7 +23,7 @@ export class SupabaseBookingRepository implements BookingRepository {
     dateRange: DateRange;
   }): Promise<Booking> {
 
-    const { data, error } = await supabase.rpc("create_booking_atomic",
+    const { data, error } = await getSupabaseClient().rpc("create_booking_atomic",
       {
         p_user_id: input.userId,
         p_room_id: Number(input.roomId),
@@ -58,7 +58,7 @@ export class SupabaseBookingRepository implements BookingRepository {
   }
 
   async findByUserId(userId: string): Promise<Booking[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseClient()
       .from("bookings")
       .select("*")
       .eq("user_id", userId);
