@@ -1,29 +1,29 @@
-import { Booking } from "@/domain/entities/Booking";
+import { BookingConfirmation } from "@/domain/read-models/BookingConfirmation";
 import { BookingResultVM } from "../models/BookingResultVM";
 
-export function mapBookingResultVM(booking: Booking): BookingResultVM {
+export function mapBookingResultVM(row: BookingConfirmation): BookingResultVM {
    return {
-    bookingId: booking.id,
-    status: booking.status,
-    userId: booking.userId,
+    bookingId: row.booking_id,
+    status: row.status,
+    userId: row.user_id,
     accommodation: {
-      id: "",
-      name: "",
-      city: "",
-      country: "",
+      id: row.accommodation_id.toString(),
+      name: row.accommodation_name,
+      city: row.city,
+      country: row.country,
     },
     room: {
-      id: booking.roomId,
-      type: "",
-      capacity: 0,
-      pricePerNight: 0,
+      id: row.room_id.toString(),
+      type: row.room_type,
+      capacity: row.capacity,
+      pricePerNight: row.price_per_night,
     },
     stay: {
-      from: booking.dateRange.startDate.toISOString().slice(0, 10),
-      to: booking.dateRange.endDate.toISOString().slice(0, 10),
-      nights: booking.dateRange.numberOfNights,
-      totalPrice: booking.totalPrice.amount,
-      currency: booking.totalPrice.currency,
+      from: row.from_date,
+      to: row.to_date,
+      nights: row.nights,
+      totalPrice: row.total_amount,
+      currency: row.currency,
     },
   };
 }

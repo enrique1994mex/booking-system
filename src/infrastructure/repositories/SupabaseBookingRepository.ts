@@ -66,15 +66,6 @@ export class SupabaseBookingRepository implements BookingRepository {
     return data?.map(this.toDomain) ?? [];
   }
 
-  async findByRoomId(roomId: string): Promise<Booking[]> {
-    const { data } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("room_id", roomId);
-
-    return data?.map(this.toDomain) ?? [];
-  }
-
   private toDomain(row: BookingRow): Booking {
     return {
       id: row.id,

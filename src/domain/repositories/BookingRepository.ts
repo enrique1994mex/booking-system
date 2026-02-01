@@ -8,5 +8,4 @@ export interface BookingRepository {
     dateRange: DateRange;
   }): Promise<Booking>;
   findByUserId(userId: string): Promise<Booking[]>;
-  findByRoomId(roomId: string): Promise<Booking[]>;
 }

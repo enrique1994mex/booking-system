@@ -5,7 +5,8 @@ import { mapBookingPreviewVM } from '@/ui/mappers/mapBookingPreviewVM';
 import { getRoomDetailService } from '../services/getRoomDetailService';
 import { BookingResultVM } from '@/ui/models/BookingResultVM';
 import { mapBookingResultVM } from '@/ui/mappers/mapBookingResultVM';
-import { createBookingService } from '../services/createBookingService';
+import { createBookingService } from '../services/bookingCommandService';
+import { getBookingConfirmationService } from '../services/bookingQueryService';
 
 type BookingStatus =
   | "idle"
@@ -41,7 +42,7 @@ export const getRoomDetail = createAsyncThunk<
       // Service call to get room details
       const result = await getRoomDetailService(params.roomId);
 
-      // TEMPORAL (frontend snapshot calculation)
+      // Map to BookingPreviewVM
       const vm = mapBookingPreviewVM(result, params.dateRange);
 
       return vm;
@@ -79,8 +80,10 @@ export const confirmBooking = createAsyncThunk<
           to: payload.to,
         },
       });
-      // TEMPORAL: usamos preview snapshot para mostrar resumen final
-      const vm = mapBookingResultVM(booking); 
+      
+      // Service call to get booking confirmation details
+      const confirmation = await getBookingConfirmationService(booking.id);
+      const vm = mapBookingResultVM(confirmation); 
 
       return vm;
     } catch (error) {
