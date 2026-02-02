@@ -5,6 +5,7 @@ services:
       args:
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_REPOSITORY_MODE: ${NEXT_PUBLIC_REPOSITORY_MODE}
     container_name: booking-system
     env_file:
       - .env.production
