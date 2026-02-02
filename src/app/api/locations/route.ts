@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-import { MapboxLocationRepository } from "@/infrastructure/repositories/MapboxLocationRepository";
-import { SearchLocations } from "@/domain/use-cases/SearchLocation";
+import { searchLocationsService } from "@/application/services/LocationService";
 import { LocationApiDTO } from "./dto/LocationApiDTO";
-
-const repo = new MapboxLocationRepository();
-const searchLocations = new SearchLocations(repo);
 
 export async function GET(req: Request) {
   try {
@@ -15,7 +11,7 @@ export async function GET(req: Request) {
       return NextResponse.json([]);
     }
 
-    const locations = await searchLocations.execute(query);
+    const locations = await searchLocationsService(query);
 
     if (!locations || !Array.isArray(locations)) {
       return NextResponse.json([], { status: 200 });
