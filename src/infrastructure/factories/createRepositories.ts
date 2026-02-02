@@ -2,11 +2,13 @@ import { SupabaseAccommodationRepository } from "../repositories/SupabaseAccommo
 import { SupabaseRoomRepository } from "../repositories/SupabaseRoomRepository";
 import { SupabaseBookingRepository } from "../repositories/SupabaseBookingRepository";
 import { SupabaseBookingQueryRepository } from "../repositories/SupabaseBookingQueryRepository";
+import { SupabaseAuthRepository } from "../repositories/SupabaseAuthRepository";
 import { MockAccommodationRepository } from "../repositories/MockAccommodationRepository";
 import { MockRoomRepository } from "../repositories/MockRoomRepository";
 import { MockBookingRepository } from "../repositories/MockBookingRepository";
-import { MapboxLocationRepository } from "../repositories/MapboxLocationRepository";
 import { MockLocationRepository } from "../repositories/MockLocationRepository";
+import { MockAuthRepository } from "../repositories/MockAuthRepository";
+import { MapboxLocationRepository } from "../repositories/MapboxLocationRepository";
 
 type RepositoryMode = "mock" | "supabase";
 
@@ -26,6 +28,7 @@ export function createRepositories(mode?: RepositoryMode) {
       bookingRepository: new MockBookingRepository(),
       bookingQueryRepository: new MockBookingRepository(),
       locationRepository: new MockLocationRepository(),
+      authRepository: new MockAuthRepository(),
     };
   }
 
@@ -35,5 +38,6 @@ export function createRepositories(mode?: RepositoryMode) {
     bookingRepository: new SupabaseBookingRepository(),
     bookingQueryRepository: new SupabaseBookingQueryRepository(),
     locationRepository: new MapboxLocationRepository(),
+    authRepository: new SupabaseAuthRepository(),
   };
 }
