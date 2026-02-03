@@ -1,47 +1,64 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createSupabaseMiddlewareClient } from "./infrastructure/supabase/supabaseServerClient";
+import { createServerClient } from "@supabase/ssr";
 
 const PROTECTED_ROUTES = ["/booking", "/checkout", "/profile"];
 const AUTH_ROUTES = ["/login", "/signup"];
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next();
 
-  // Create response to pass through
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-  const supabase = createSupabaseMiddlewareClient(request, response);
-  // Refresh session if expired
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            res.cookies.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { pathname } = req.nextUrl;
+
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
     pathname.startsWith(route)
   );
-  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
-  // Redirect unauthenticated users from protected routes to login
+  const isAuthRoute = AUTH_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  );
+
   if (isProtectedRoute && !user) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirectTo", pathname);
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.searchParams.set(
+      "redirectTo", 
+      req.nextUrl.pathname + req.nextUrl.search
+    );
+
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect authenticated users from auth routes to home
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
-  return response;
+  return res;
 }
 
 export const config = {
   matcher: [
-    "/((?!api|_next|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp)$).*)",
   ],
 };
