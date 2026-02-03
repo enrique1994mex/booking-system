@@ -5,6 +5,7 @@ import { antdTheme } from "@/ui/theme/antdTheme";
 import { RootLayout } from "@/ui/layouts/RootLayout";
 import { GlobalLoader } from "@/ui/components/GlobalLoader";
 import { Providers } from "@/app/providers";
+import { AuthBootstrap } from "@/app/AuthBootstrap";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,8 +22,10 @@ export default function Layout({
     <AntdRegistry>
       <ConfigProvider theme={antdTheme}>
         <Providers>
-          <GlobalLoader />
-          <RootLayout>{children}</RootLayout>
+          <AuthBootstrap>
+            <GlobalLoader />
+            <RootLayout>{children}</RootLayout>
+          </AuthBootstrap>
         </Providers>
       </ConfigProvider>
     </AntdRegistry>
