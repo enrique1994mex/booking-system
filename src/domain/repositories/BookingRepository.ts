@@ -1,4 +1,4 @@
-import { Booking } from "../entities/Booking";
+import { Booking, BookingStatus } from "../entities/Booking";
 import { DateRange } from "../value-objects/DateRange";
 
 export interface BookingRepository {
@@ -8,4 +8,6 @@ export interface BookingRepository {
     dateRange: DateRange;
   }): Promise<Booking>;
   findByUserId(userId: string): Promise<Booking[]>;
+  findById(bookingId: string): Promise<Booking | null>;
+  updateStatus(bookingId: string, status: BookingStatus | string): Promise<Booking>;
 }

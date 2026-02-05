@@ -76,4 +76,18 @@ export class MockBookingRepository implements BookingRepository, BookingQueryRep
       currency: booking.totalPrice.currency,
     };
   }
+
+  async updateStatus(bookingId: string, status: BookingStatus): Promise<Booking> {
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) {
+      throw new Error(`Booking not found: ${bookingId}`);
+    }
+    booking.status = status;
+    return booking;
+  }
+
+  async findById(bookingId: string): Promise<Booking | null> {
+    const booking = bookings.find(b => b.id === bookingId);
+    return booking || null;
+  }
 }
