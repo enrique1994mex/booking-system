@@ -1,5 +1,6 @@
 import { BookingRepository } from "../../repositories/BookingRepository";
 import { PaymentRepository, WebhookEvent } from "../../repositories/PaymentRepository";
+import { PaymentPersistenceRepository } from "../../repositories/PaymentPersistenceRepository";
 
 export interface ProcessWebhookResult {
   success: boolean;
@@ -10,7 +11,8 @@ export interface ProcessWebhookResult {
 export class ProcessWebhookEvent {
   constructor(
     private readonly paymentRepository: PaymentRepository,
-    private readonly bookingRepository: BookingRepository
+    private readonly bookingRepository: BookingRepository,
+    private readonly paymentPersistenceRepository: PaymentPersistenceRepository
   ) {}
 
   async execute(payload: string, signature: string): Promise<ProcessWebhookResult> {
@@ -37,21 +39,31 @@ export class ProcessWebhookEvent {
   }
 
   private async handlePaymentSuccess(event: WebhookEvent): Promise<ProcessWebhookResult> {
-    const bookingId = event.metadata?.bookingId;
+  const bookingId = event.metadata?.bookingId;
+  const sessionId = event.sessionId;
+  const paymentIntentId = event.paymentIntentId;
 
-    if (!bookingId) {
-      console.warn("Payment succeeded but no bookingId in metadata");
-      return { success: true, action: "ignored" };
-    }
-
-    await this.bookingRepository.updateStatus(bookingId, "CONFIRMED");
-
-    return {
-      success: true,
-      action: "booking_confirmed",
-      bookingId,
-    };
+  if (!bookingId || !sessionId || !paymentIntentId) {
+    console.warn("Missing data in webhook", event);
+    return { success: true, action: "ignored" };
   }
+
+  // 1. Mark payment as SUCCEEDED
+  await this.paymentPersistenceRepository.markSucceeded({
+    bookingId,
+    stripeSessionId: sessionId,
+    stripePaymentIntentId: paymentIntentId,
+  });
+
+  // 2. Confirm booking
+  await this.bookingRepository.updateStatus(bookingId, "CONFIRMED");
+
+  return {
+    success: true,
+    action: "booking_confirmed",
+    bookingId,
+  };
+}
 
   private async handlePaymentFailed(event: WebhookEvent): Promise<ProcessWebhookResult> {
     const bookingId = event.metadata?.bookingId;

@@ -1,3 +1,4 @@
+import { createServerRepositories } from "@/infrastructure/factories/createServerRepositories";
 import { createRepositories } from "@/infrastructure/factories/createRepositories";
 import {
   CreatePaymentIntent,
@@ -12,7 +13,7 @@ import { CreatePaymentIntentResult, CreateCheckoutSessionResult } from "@/domain
 export async function createPaymentIntentService(
   input: CreatePaymentIntentInput
 ): Promise<CreatePaymentIntentResult> {
-  const { paymentRepository } = createRepositories();
+  const { paymentRepository } = createServerRepositories();
   const useCase = new CreatePaymentIntent(paymentRepository);
   return useCase.execute(input);
 }
@@ -20,7 +21,7 @@ export async function createPaymentIntentService(
 export async function createCheckoutSessionService(
   input: CreateCheckoutSessionInput
 ): Promise<CreateCheckoutSessionResult> {
-  const { paymentRepository } = createRepositories();
+  const { paymentRepository } = createServerRepositories();
   const useCase = new CreateCheckoutSession(paymentRepository);
   return useCase.execute(input);
 }
@@ -29,17 +30,18 @@ export async function processWebhookEventService(
   payload: string,
   signature: string
 ): Promise<ProcessWebhookResult> {
-  const { paymentRepository, bookingRepository } = createRepositories();
-  const useCase = new ProcessWebhookEvent(paymentRepository, bookingRepository);
+  const { paymentRepository } = createServerRepositories();
+  const { bookingRepository, paymentPersistenceRepository } = createRepositories();
+  const useCase = new ProcessWebhookEvent(paymentRepository, bookingRepository, paymentPersistenceRepository);
   return useCase.execute(payload, signature);
 }
 
 export async function cancelPaymentIntentService(paymentIntentId: string): Promise<void> {
-  const { paymentRepository } = createRepositories();
+  const { paymentRepository } = createServerRepositories();
   return paymentRepository.cancelPaymentIntent(paymentIntentId);
 }
 
 export async function getPaymentIntentService(paymentIntentId: string) {
-  const { paymentRepository } = createRepositories();
+  const { paymentRepository } = createServerRepositories();
   return paymentRepository.getPaymentIntent(paymentIntentId);
 }

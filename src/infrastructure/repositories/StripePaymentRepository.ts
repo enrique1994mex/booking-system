@@ -1,3 +1,4 @@
+import "server-only";
 import Stripe from "stripe";
 import { Payment, PaymentStatus, PaymentMetadata } from "@/domain/entities/Payment";
 import { Money } from "@/domain/value-objects/Money";
@@ -90,12 +91,44 @@ export class StripePaymentRepository implements PaymentRepository {
   }
 
   async constructWebhookEvent(payload: string, signature: string): Promise<WebhookEvent> {
-    const webhookSecret = getStripeWebhookSecret();
+  const event = this.stripe.webhooks.constructEvent(
+    payload,
+    signature,
+    process.env.STRIPE_WEBHOOK_SECRET!
+  );
 
-    const event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  switch (event.type) {
+    case "checkout.session.completed": {
+      const session = event.data.object as Stripe.Checkout.Session;
 
-    return this.mapStripeEventToWebhookEvent(event);
+      return {
+        type: event.type,
+        sessionId: session.id,
+        paymentIntentId: session.payment_intent as string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        metadata: session.metadata as any,
+        amount: session.amount_total ?? undefined,
+        currency: session.currency ?? undefined,
+      };
+    }
+
+    case "payment_intent.succeeded": {
+      const intent = event.data.object as Stripe.PaymentIntent;
+
+      return {
+        type: event.type,
+        paymentIntentId: intent.id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        metadata: intent.metadata as any,
+        amount: intent.amount_received,
+        currency: intent.currency,
+      };
+    }
+
+    default:
+      return { type: event.type };
   }
+}
 
   async getPaymentIntent(paymentIntentId: string): Promise<Payment | null> {
     try {
