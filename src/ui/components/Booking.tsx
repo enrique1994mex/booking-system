@@ -5,12 +5,14 @@ import { CalendarOutlined, CheckCircleOutlined, EnvironmentOutlined, HomeOutline
 import { useAppSelector, useAppDispatch } from "@/application/hooks";
 import { confirmBooking } from "@/application/slices/bookingSlice";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/application/hooks/useAuth";
 
 const { Title, Text } = Typography;
 
 
 export function Booking() {
   const { preview, error, status } = useAppSelector((state) => state.booking);
+  const { user } = useAuth();
 
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -54,23 +56,25 @@ export function Booking() {
   const handleConfirm = async () => {
   if (!preview || isConfirming) return;
 
-    try {
-      const resultAction = await dispatch(
-        confirmBooking({
-          userId: "demo-user-1", // luego vendrá de auth
-          roomId: preview.roomId,
-          from: preview.stay.from,
-          to: preview.stay.to,
-        })
-      );
+  try {
+    const resultAction = await dispatch(
+      confirmBooking({
+        userId: user?.id || "",
+        roomId: preview.roomId,
+        from: preview.stay.from,
+        to: preview.stay.to,
+      })
+    );
 
-      if (confirmBooking.fulfilled.match(resultAction)) {
-        router.push("/booking/success");
-      }
-    } catch (error) { 
-      console.error(error);
+    if (confirmBooking.fulfilled.match(resultAction)) {
+      const bookingId = resultAction.payload.bookingId;
+
+      router.push(`/payment/${bookingId}`);
     }
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
     <Flex
@@ -229,8 +233,6 @@ export function Booking() {
           type="primary"
           size="large"
           block
-          loading={isConfirming}
-          disabled={isConfirming}
           onClick={handleConfirm}
           style={{
             marginTop: 24,
@@ -239,7 +241,7 @@ export function Booking() {
             fontWeight: 600,
           }}
         >
-          Confirm Booking
+          Pay now 
         </Button>
 
         <Text
@@ -251,7 +253,7 @@ export function Booking() {
             fontSize: 12,
           }}
         >
-          You will not be charged yet
+          You’ll be redirected to secure payment
         </Text>
       </Card>
     </Flex>
