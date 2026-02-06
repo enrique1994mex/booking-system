@@ -3,13 +3,13 @@ import { SupabaseRoomRepository } from "../repositories/SupabaseRoomRepository";
 import { SupabaseBookingRepository } from "../repositories/SupabaseBookingRepository";
 import { SupabaseBookingQueryRepository } from "../repositories/SupabaseBookingQueryRepository";
 import { SupabaseAuthRepository } from "../repositories/SupabaseAuthRepository";
-import { StripePaymentRepository } from "../repositories/StripePaymentRepository";
 import { MockAccommodationRepository } from "../repositories/MockAccommodationRepository";
+import { SupabasePaymentPersistenceRepository } from "../repositories/SupabasePaymentPersistenceRepository";
 import { MockRoomRepository } from "../repositories/MockRoomRepository";
 import { MockBookingRepository } from "../repositories/MockBookingRepository";
 import { MockLocationRepository } from "../repositories/MockLocationRepository";
 import { MockAuthRepository } from "../repositories/MockAuthRepository";
-import { MockPaymentRepository } from "../repositories/MockPaymentRepository";
+import { MockPaymentPersistenceRepository } from "../repositories/MockPaymentPersistenceRepository";
 import { MapboxLocationRepository } from "../repositories/MapboxLocationRepository";
 
 type RepositoryMode = "mock" | "supabase";
@@ -31,7 +31,7 @@ export function createRepositories(mode?: RepositoryMode) {
       bookingQueryRepository: new MockBookingRepository(),
       locationRepository: new MockLocationRepository(),
       authRepository: new MockAuthRepository(),
-      paymentRepository: new MockPaymentRepository(),
+      paymentPersistenceRepository: new MockPaymentPersistenceRepository(),
     };
   }
 
@@ -42,6 +42,6 @@ export function createRepositories(mode?: RepositoryMode) {
     bookingQueryRepository: new SupabaseBookingQueryRepository(),
     locationRepository: new MapboxLocationRepository(),
     authRepository: new SupabaseAuthRepository(),
-    paymentRepository: new StripePaymentRepository(),
+    paymentPersistenceRepository: new SupabasePaymentPersistenceRepository(),
   };
 }
