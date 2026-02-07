@@ -1,4 +1,4 @@
-import { getSupabaseClient  } from "@/infrastructure/db/supabaseClient";
+import { getSupabaseClient  } from "@/infrastructure/supabase/supabaseClient";
 import { AccommodationRepository } from "@/domain/repositories/AccommodationRepository";
 import { Accommodation } from "@/domain/entities/Accommodation";
 import { LocationSearch } from "@/domain/use-cases/dto/LocationSearch";

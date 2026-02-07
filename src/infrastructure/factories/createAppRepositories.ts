@@ -4,12 +4,10 @@ import { SupabaseBookingRepository } from "../repositories/SupabaseBookingReposi
 import { SupabaseBookingQueryRepository } from "../repositories/SupabaseBookingQueryRepository";
 import { SupabaseAuthRepository } from "../repositories/SupabaseAuthRepository";
 import { MockAccommodationRepository } from "../repositories/MockAccommodationRepository";
-import { SupabasePaymentPersistenceRepository } from "../repositories/SupabasePaymentPersistenceRepository";
 import { MockRoomRepository } from "../repositories/MockRoomRepository";
 import { MockBookingRepository } from "../repositories/MockBookingRepository";
 import { MockLocationRepository } from "../repositories/MockLocationRepository";
 import { MockAuthRepository } from "../repositories/MockAuthRepository";
-import { MockPaymentPersistenceRepository } from "../repositories/MockPaymentPersistenceRepository";
 import { MapboxLocationRepository } from "../repositories/MapboxLocationRepository";
 
 type RepositoryMode = "mock" | "supabase";
@@ -20,7 +18,7 @@ function getRepositoryMode(): RepositoryMode {
   return "supabase";
 }
 
-export function createRepositories(mode?: RepositoryMode) {
+export function createAppRepositories(mode?: RepositoryMode) {
   const resolvedMode = mode ?? getRepositoryMode();
 
   if (resolvedMode === "mock") {
@@ -31,7 +29,6 @@ export function createRepositories(mode?: RepositoryMode) {
       bookingQueryRepository: new MockBookingRepository(),
       locationRepository: new MockLocationRepository(),
       authRepository: new MockAuthRepository(),
-      paymentPersistenceRepository: new MockPaymentPersistenceRepository(),
     };
   }
 
@@ -42,6 +39,5 @@ export function createRepositories(mode?: RepositoryMode) {
     bookingQueryRepository: new SupabaseBookingQueryRepository(),
     locationRepository: new MapboxLocationRepository(),
     authRepository: new SupabaseAuthRepository(),
-    paymentPersistenceRepository: new SupabasePaymentPersistenceRepository(),
   };
 }

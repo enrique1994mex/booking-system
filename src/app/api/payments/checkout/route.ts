@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/infrastructure/supabase/supabaseServerClient";
 import { createCheckoutSessionService } from "@/application/services/PaymentService";
-import { createRepositories } from "@/infrastructure/factories/createRepositories";
+import { createSystemRepositories } from "@/infrastructure/factories/createSystemRepositories";
 
 interface CreateCheckoutRequestBody {
   bookingId: string;
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     // 3. Validate booking ownership
-    const { bookingRepository, paymentPersistenceRepository } = createRepositories();
+    const { bookingRepository, paymentPersistenceRepository } = createSystemRepositories();
     const booking = await bookingRepository.findById(bookingId);
 
     if (!booking) {

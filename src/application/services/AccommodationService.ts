@@ -1,4 +1,4 @@
-import { createRepositories } from "@/infrastructure/factories/createRepositories";
+import { createAppRepositories } from "@/infrastructure/factories/createAppRepositories";
 import { GetAccommodationAvailability } from "@/domain/use-cases/GetAccommodationAvailability";
 import { DateRange } from "@/domain/value-objects/DateRange";
 
@@ -7,7 +7,7 @@ export async function getAccommodationAvailabilityService(
   startDate: string,
   endDate: string
 ) {
-  const { roomRepository, accommodationRepository } = createRepositories();
+  const { roomRepository, accommodationRepository } = createAppRepositories();
 
   const dateRange = new DateRange(
     new Date(startDate),

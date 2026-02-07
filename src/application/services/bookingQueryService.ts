@@ -1,7 +1,7 @@
-import { createRepositories } from "@/infrastructure/factories/createRepositories";
+import { createAppRepositories } from "@/infrastructure/factories/createAppRepositories";
 
 export async function getBookingConfirmationService(bookingId: string) {
-  const { bookingQueryRepository } = createRepositories();
+  const { bookingQueryRepository } = createAppRepositories();
   const confirmation = await bookingQueryRepository.getConfirmationById(bookingId);
   return confirmation;
 }

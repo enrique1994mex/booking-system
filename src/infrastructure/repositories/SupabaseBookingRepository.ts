@@ -1,4 +1,5 @@
-import { getSupabaseClient } from "@/infrastructure/db/supabaseClient";
+import { getSupabaseClient } from "@/infrastructure/supabase/supabaseClient";
+import { getSupabaseServiceClient } from "@/infrastructure/supabase/supabaseServiceClient";
 import { BookingRepository } from "@/domain/repositories/BookingRepository";
 import { Booking } from "@/domain/entities/Booking";
 import { BookingStatus } from "@/domain/entities/Booking";
@@ -18,13 +19,22 @@ interface BookingRow {
 
 export class SupabaseBookingRepository implements BookingRepository {
 
+  private supabase: ReturnType<typeof getSupabaseClient>;
+
+  constructor(opts?: { role?: "anon" | "service" }) {
+    this.supabase =
+      opts?.role === "service"
+        ? getSupabaseServiceClient()
+        : getSupabaseClient();
+  }
+
   async create(input: {
     userId: string;
     roomId: string;
     dateRange: DateRange;
   }): Promise<Booking> {
 
-    const { data, error } = await getSupabaseClient().rpc("create_booking_atomic",
+    const { data, error } = await this.supabase.rpc("create_booking_atomic",
       {
         p_user_id: input.userId,
         p_room_id: Number(input.roomId),
@@ -59,7 +69,7 @@ export class SupabaseBookingRepository implements BookingRepository {
   }
 
   async findByUserId(userId: string): Promise<Booking[]> {
-    const { data } = await getSupabaseClient()
+    const { data } = await this.supabase
       .from("bookings")
       .select("*")
       .eq("user_id", userId);
@@ -79,7 +89,7 @@ export class SupabaseBookingRepository implements BookingRepository {
   }
 
   async findById(bookingId: string): Promise<Booking | null> {
-    const { data, error } = await getSupabaseClient()
+    const { data, error } = await this.supabase
       .from("bookings")
       .select("*")
       .eq("id", bookingId)
@@ -93,7 +103,7 @@ export class SupabaseBookingRepository implements BookingRepository {
   }
 
   async updateStatus(bookingId: string, status: BookingStatus | string ): Promise<Booking> {
-    const { data, error } = await getSupabaseClient()
+    const { data, error } = await this.supabase
       .from("bookings")
       .update({ status })
       .eq("id", bookingId)

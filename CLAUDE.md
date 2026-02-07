@@ -47,7 +47,7 @@
 
 ### Repository Mode Switching
 
-The factory `createRepositories()` supports environment-based switching:
+The factory `createAppRepositories()` supports environment-based switching:
 
 ```env
 NEXT_PUBLIC_REPOSITORY_MODE=mock    # Use mock repositories (development/testing)
@@ -56,8 +56,8 @@ NEXT_PUBLIC_REPOSITORY_MODE=supabase # Use Supabase repositories (production)
 
 Or pass mode directly:
 ```typescript
-const repos = createRepositories("mock");
-const repos = createRepositories("supabase");
+const repos = createAppRepositories("mock");
+const repos = createAppRepositories("supabase");
 ```
 
 ### Minor Architectural Notes

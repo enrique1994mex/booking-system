@@ -1,8 +1,8 @@
-import { createRepositories } from "@/infrastructure/factories/createRepositories";
+import { createAppRepositories } from "@/infrastructure/factories/createAppRepositories";
 import { SearchLocations } from "@/domain/use-cases/SearchLocation";
 
 export async function searchLocationsService(query: string) {
-  const { locationRepository } = createRepositories();
+  const { locationRepository } = createAppRepositories();
   const useCase = new SearchLocations(locationRepository);
   return useCase.execute(query);
 }

@@ -1,7 +1,7 @@
 import { AuthError, User as SupabaseUser } from "@supabase/supabase-js";
 import { User } from "@/domain/entities/User";
 import { AuthRepository, AuthCredentials, SignUpData, AuthSession } from "@/domain/repositories/AuthRepository";
-import { getSupabaseClient } from "../db/supabaseClient";
+import { getSupabaseClient } from "../supabase/supabaseClient";
 
 export class AuthenticationError extends Error {
   constructor(

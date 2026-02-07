@@ -1,4 +1,5 @@
-import { getSupabaseClient } from "@/infrastructure/db/supabaseClient";
+import { getSupabaseClient } from "@/infrastructure/supabase/supabaseClient";
+import { getSupabaseServiceClient } from "@/infrastructure/supabase/supabaseServiceClient";
 import { RoomRepository } from "@/domain/repositories/RoomRepository";
 import { Room } from "@/domain/entities/Room";
 import { DateRange } from "@/domain/value-objects/DateRange";
@@ -13,8 +14,18 @@ interface RoomRow {
 
 export class SupabaseRoomRepository implements RoomRepository {
 
+  private supabase: ReturnType<typeof getSupabaseClient>;
+
+  constructor(opts?: { role?: "anon" | "service" }) {
+    this.supabase =
+      opts?.role === "service"
+        ? getSupabaseServiceClient()
+        : getSupabaseClient();
+  }
+
+
   async findById(roomId: string): Promise<Room | null> {
-    const { data, error } = await getSupabaseClient()
+    const { data, error } = await this.supabase
       .from("rooms")
       .select("*")
       .eq("id", roomId)
@@ -25,7 +36,7 @@ export class SupabaseRoomRepository implements RoomRepository {
   }
 
   async findByAccommodationId(accommodationId: string): Promise<Room[]> {
-    const { data, error } = await getSupabaseClient()
+    const { data, error } = await this.supabase
       .from("rooms")
       .select("*")
       .eq("accommodation_id", accommodationId);
@@ -38,14 +49,14 @@ export class SupabaseRoomRepository implements RoomRepository {
     const from = dateRange.startDate.toISOString().split("T")[0];
     const to = dateRange.endDate.toISOString().split("T")[0];
 
-    const { data: rooms, error: roomsError } = await getSupabaseClient()
+    const { data: rooms, error: roomsError } = await this.supabase
       .from("rooms")
       .select("*")
       .eq("accommodation_id", accommodationId);
 
     if (roomsError) throw roomsError;
 
-    const { data: bookings, error: bookingsError } = await getSupabaseClient()
+    const { data: bookings, error: bookingsError } = await this.supabase
       .from("bookings")
       .select("room_id")
       .lt("from_date", to)

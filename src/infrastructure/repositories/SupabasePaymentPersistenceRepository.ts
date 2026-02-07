@@ -1,10 +1,18 @@
-import { getSupabaseClient } from "@/infrastructure/db/supabaseClient";
+import { getSupabaseClient } from "@/infrastructure/supabase/supabaseClient";
+import { getSupabaseServiceClient } from "@/infrastructure/supabase/supabaseServiceClient";
 import { PaymentStatus } from "@/domain/entities/Payment";
 import { PaymentPersistenceRepository } from "@/domain/repositories/PaymentPersistenceRepository";
 import { Money } from "@/domain/value-objects/Money";
 
 export class SupabasePaymentPersistenceRepository implements PaymentPersistenceRepository {
   private supabase = getSupabaseClient();
+
+  constructor(opts?: { role?: "anon" | "service" }) {
+    this.supabase =
+      opts?.role === "service"
+        ? getSupabaseServiceClient()
+        : getSupabaseClient();
+  }
 
   async createPendingPayment(input: {
     bookingId: string;

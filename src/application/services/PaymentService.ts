@@ -1,5 +1,5 @@
 import { createServerRepositories } from "@/infrastructure/factories/createServerRepositories";
-import { createRepositories } from "@/infrastructure/factories/createRepositories";
+import { createSystemRepositories } from "@/infrastructure/factories/createSystemRepositories";
 import {
   CreatePaymentIntent,
   CreateCheckoutSession,
@@ -31,7 +31,7 @@ export async function processWebhookEventService(
   signature: string
 ): Promise<ProcessWebhookResult> {
   const { paymentRepository } = createServerRepositories();
-  const { bookingRepository, paymentPersistenceRepository } = createRepositories();
+  const { bookingRepository, paymentPersistenceRepository } = createSystemRepositories();
   const useCase = new ProcessWebhookEvent(paymentRepository, bookingRepository, paymentPersistenceRepository);
   return useCase.execute(payload, signature);
 }
