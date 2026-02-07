@@ -144,7 +144,7 @@ export function SearchResults() {
   );
 
   if (error) {
-    return <Alert type="error" message={error} />;
+    return <Alert type="error" title={error} />;
   }
 
   return (

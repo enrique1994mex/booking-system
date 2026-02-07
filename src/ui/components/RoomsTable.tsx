@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Table } from "antd";
+import { Button, Table, Tag } from "antd";
+import { TeamOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { AccommodationCardVM } from "../models/AccommodationCardVM";
 
@@ -12,31 +13,43 @@ interface RoomsTableProps {
 }
 
 export function RoomsTable({ rooms, onBook }: RoomsTableProps) {
-
   const columns: ColumnsType<RoomRow> = [
     {
-      title: "Type",
+      title: "Room type",
       dataIndex: "type",
       key: "type",
+      render: (value) => (
+        <span style={{ color: "#003b95", fontWeight: 500 }}>{value}</span>
+      ),
     },
     {
-      title: "Capacity",
+      title: "Guests",
       dataIndex: "capacity",
       key: "capacity",
-      render: (value) => `${value} personas`,
+      render: (value) => (
+        <Tag icon={<TeamOutlined />} color="default">
+          {value} {value === 1 ? "guest" : "guests"}
+        </Tag>
+      ),
     },
     {
-      title: "Price / night",
+      title: "Price per night",
       dataIndex: "pricePerNight",
       key: "pricePerNight",
-      render: (value) => `$${value.toFixed(2)}`,
+      align: "right",
+      render: (value) => (
+        <span style={{ fontSize: 16, fontWeight: 600 }}>
+          $ {value.toFixed(2)}
+        </span>
+      ),
     },
     {
-      title: "Action",
+      title: "",
       key: "action",
+      align: "right",
       render: (_, room) => (
-        <Button type="primary" onClick={() => onBook(room)} target="_blank">
-          Booking
+        <Button type="primary" onClick={() => onBook(room)}>
+          Reserve
         </Button>
       ),
     },
