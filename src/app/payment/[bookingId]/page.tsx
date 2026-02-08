@@ -1,6 +1,6 @@
-// app/payment/[bookingId]/page.tsx
 import { notFound } from "next/navigation";
 import { PayButton } from "@/ui/components/PayButton";
+import "./payment.css";
 
 interface PageProps {
   params: Promise<{ bookingId: string }>;
@@ -8,22 +8,30 @@ interface PageProps {
 
 export default async function PaymentPage({ params }: PageProps) {
   const { bookingId } = await params;
-  console.log("Payment page for bookingId:", bookingId);
-
-  // (opcional pero recomendado)
-  // Aquí puedes validar que el booking exista y esté UNPAID
-  // usando getSupabaseServerClient()
 
   if (!bookingId) {
     notFound();
   }
 
   return (
-    <main>
-      <h1>Confirm your payment</h1>
-      <p>Booking ID: {bookingId}</p>
+    <main className="payment-page">
+      <div className="payment-card">
+        <div className="payment-card__header">
+          <h2 className="payment-card__title">Confirm your payment</h2>
+          <p className="payment-card__subtitle">
+            Complete your reservation securely
+          </p>
+        </div>
 
-      <PayButton bookingId={bookingId} />
+        <div className="payment-card__body">
+          <div className="payment-card__booking-info">
+            <span className="payment-card__booking-label">Booking ID</span>
+            <span className="payment-card__booking-id">{bookingId}</span>
+          </div>
+
+          <PayButton bookingId={bookingId} />
+        </div>
+      </div>
     </main>
   );
 }
