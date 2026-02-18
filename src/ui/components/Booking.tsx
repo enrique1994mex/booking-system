@@ -67,9 +67,7 @@ export function Booking() {
     );
 
     if (confirmBooking.fulfilled.match(resultAction)) {
-      const bookingId = resultAction.payload.bookingId;
-
-      router.push(`/payment/${bookingId}`);
+      router.push(`/payment/${resultAction.payload}`);
     }
   } catch (error) {
     console.error(error);
@@ -234,6 +232,8 @@ export function Booking() {
           size="large"
           block
           onClick={handleConfirm}
+          disabled={isConfirming}
+          loading={isConfirming}
           style={{
             marginTop: 24,
             height: 48,

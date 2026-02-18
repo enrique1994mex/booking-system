@@ -158,7 +158,7 @@ export function Accommodation() {
             {data.description}
           </Paragraph>
         </div>
-        <Divider type="vertical" style={{ height: "auto" }} />
+        <Divider orientation="vertical" style={{ height: "auto" }} />
         <Flex
           vertical
           align="flex-end"

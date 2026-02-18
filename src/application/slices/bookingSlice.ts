@@ -3,30 +3,26 @@ import { RootState } from "../store";
 import { BookingPreviewVM } from '@/ui/models/BookingPreviewVM';
 import { mapBookingPreviewVM } from '@/ui/mappers/mapBookingPreviewVM';
 import { getRoomDetailService } from '../services/getRoomDetailService';
-import { BookingResultVM } from '@/ui/models/BookingResultVM';
-import { mapBookingResultVM } from '@/ui/mappers/mapBookingResultVM';
 import { createBookingService } from '../services/bookingCommandService';
-import { getBookingConfirmationService } from '../services/bookingQueryService';
 
 type BookingStatus =
   | "idle"
   | "loadingPreview"
   | "readyToConfirm"
   | "confirming"
-  | "confirmed"
   | "error";
 
 interface BookingState {
   error: string | null;
   preview: BookingPreviewVM | null;
-  result: BookingResultVM | null;
+  bookingId: string | null;
   status: BookingStatus;
 }
 
 const initialState: BookingState = {
   error: null,
   preview: null,
-  result: null,
+  bookingId: null,
   status: "idle",
 };
 
@@ -55,23 +51,21 @@ export const getRoomDetail = createAsyncThunk<
 
 // Async thunk to create a booking
 export const confirmBooking = createAsyncThunk<
-  BookingResultVM,
+  string,
   {
     userId: string;
     roomId: string;
     from: string;
     to: string;
   },
-  { 
+  {
     state: RootState;
-    rejectValue: string 
+    rejectValue: string
   }
 >(
   "booking/confirmBooking",
   async (payload, { rejectWithValue }) => {
     try {
-      
-      // Service call to create booking
       const booking = await createBookingService({
         userId: payload.userId,
         roomId: payload.roomId,
@@ -80,16 +74,12 @@ export const confirmBooking = createAsyncThunk<
           to: payload.to,
         },
       });
-      
-      // Service call to get booking confirmation details
-      const confirmation = await getBookingConfirmationService(booking.id);
-      const vm = mapBookingResultVM(confirmation); 
 
-      return vm;
+      return booking.id;
     } catch (error) {
       console.error("Confirm booking error:", error);
       return rejectWithValue("Failed to confirm booking");
-    } 
+    }
   }
 );
 
@@ -99,7 +89,7 @@ const bookingSlice = createSlice({
   reducers: {
     clearBooking(state) {
       state.preview = null;
-      state.result = null;
+      state.bookingId = null;
       state.error = null;
       state.status = "idle";
     },
@@ -124,10 +114,10 @@ const bookingSlice = createSlice({
         state.status = "confirming";
       })
       .addCase(confirmBooking.fulfilled, (state, action) => {
-        state.result = action.payload;
+        state.bookingId = action.payload;
         state.preview = null;
         state.error = null;
-        state.status = "confirmed";
+        state.status = "idle";
       })
       .addCase(confirmBooking.rejected, (state, action) => {
         state.error = action.payload ?? "Unknown error";
