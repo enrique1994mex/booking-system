@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { hideGlobalLoading, showGlobalLoading } from './uiSlice'; 
 import { AccommodationCardVM } from '@/ui/models/AccommodationCardVM';
 import { mapAccommodationVM } from '@/ui/mappers/mapAccommodationVM';
 import { getAccommodationAvailabilityService } from '../services/AccommodationService';
@@ -22,9 +21,7 @@ export const getAccommodationAvailability = createAsyncThunk<
   { rejectValue: string }
 >(
   'accommodation/getAvailability',
-  async (params, { dispatch, rejectWithValue }) => {
-    dispatch(showGlobalLoading());
-
+  async (params, { rejectWithValue }) => {
     try {
       // Service call to get accommodation availability
       const result = await getAccommodationAvailabilityService(
@@ -39,8 +36,6 @@ export const getAccommodationAvailability = createAsyncThunk<
     } catch (e) {
       console.error('Accommodation availability error:', e);
       return rejectWithValue("Accommodation not available");
-    } finally {
-      dispatch(hideGlobalLoading());
     }
   }
 );

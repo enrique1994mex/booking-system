@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { searchAccommodationsService } from '../services/SearchService';
-import { hideGlobalLoading, showGlobalLoading } from './uiSlice';
 
 interface SearchParams {
   location: {
@@ -43,9 +42,7 @@ export const searchAvailableAccomodations = createAsyncThunk<
   { rejectValue: string }
 >(
   'search/searchAvailableAccommodations',
-  async (params: SearchParams, { dispatch, rejectWithValue }) => {
-    dispatch(showGlobalLoading());
-
+  async (params: SearchParams, { rejectWithValue }) => {
     try {
 
       // Service call to search accommodations
@@ -62,12 +59,10 @@ export const searchAvailableAccomodations = createAsyncThunk<
           endDate: params.endDate,
         },
       };
-     
+
     } catch (e) {
       console.error('Search error:', e);
       return rejectWithValue('Search failed. Please try again.');
-    } finally {
-      dispatch(hideGlobalLoading());
     }
   }
 );
