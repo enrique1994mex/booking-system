@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BookingSuccess } from "@/ui/components/BookingSuccess";
+import { BookingSuccessSkeleton } from "@/ui/components/skeletons/BookingSuccessSkeleton";
 import { BookingConfirmation } from "@/domain/read-models/BookingConfirmation";
 import { mapBookingResultVM } from "@/ui/mappers/mapBookingResultVM";
 import { BookingResultVM } from "@/ui/models/BookingResultVM";
@@ -48,7 +49,7 @@ export default function BookingSuccessClient() {
   }, [bookingId, router]);
 
   if (loading) {
-    return <p>Confirming your payment...</p>;
+    return <BookingSuccessSkeleton />;
   }
 
   if (!booking) return null;

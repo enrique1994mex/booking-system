@@ -3,8 +3,10 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 import { AccommodationLayout } from "../layouts/AccommodationLayout";
 import { useEffect } from "react";
 import { useAppDispatch } from "@/application/hooks";
+import { usePageLoading } from "@/application/hooks/usePageLoading";
 import { getAccommodationAvailability } from "@/application/slices/accommodationSlice";
 import { Accommodation } from "../components/Accommodation";
+import { AccommodationSkeleton } from "../components/skeletons/AccommodationSkeleton";
 
 interface Props {
   searchParams: ReadonlyURLSearchParams;
@@ -13,6 +15,7 @@ interface Props {
 
 export function AccommodationPage({ searchParams, id }: Props) {
   const dispatch = useAppDispatch();
+  const { isLoading } = usePageLoading((state) => state.accommodation.loading);
 
   const from = searchParams.get("from");
   const to = searchParams.get("to");
@@ -29,7 +32,7 @@ export function AccommodationPage({ searchParams, id }: Props) {
   
   return (
     <AccommodationLayout>
-      <Accommodation />
+      {isLoading ? <AccommodationSkeleton /> : <Accommodation />}
     </AccommodationLayout>
   );
 }

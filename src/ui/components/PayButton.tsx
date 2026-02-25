@@ -4,11 +4,19 @@ import { Button } from "antd";
 import { CreditCardOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
+type PaymentStage = "idle" | "creating" | "redirecting";
+
+const stageLabels: Record<PaymentStage, string> = {
+  idle: "Pay now",
+  creating: "Securing payment...",
+  redirecting: "Redirecting...",
+};
+
 export function PayButton({ bookingId }: { bookingId: string }) {
-  const [loading, setLoading] = useState(false);
+  const [stage, setStage] = useState<PaymentStage>("idle");
 
   const handlePay = async () => {
-    setLoading(true);
+    setStage("creating");
     try {
       const res = await fetch("/api/payments/checkout", {
         method: "POST",
@@ -23,9 +31,10 @@ export function PayButton({ bookingId }: { bookingId: string }) {
       }
 
       const { url } = await res.json();
+      setStage("redirecting");
       window.location.href = url;
     } catch {
-      setLoading(false);
+      setStage("idle");
     }
   };
 
@@ -34,12 +43,12 @@ export function PayButton({ bookingId }: { bookingId: string }) {
       type="primary"
       size="large"
       icon={<CreditCardOutlined />}
-      loading={loading}
+      loading={stage !== "idle"}
       onClick={handlePay}
       block
       style={{ height: 48, fontSize: 16, fontWeight: 600 }}
     >
-      Pay now
+      {stageLabels[stage]}
     </Button>
   );
 }

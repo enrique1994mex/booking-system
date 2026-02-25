@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, Button, Card, Divider, Empty, Flex, Typography, } from "antd";
+import { BookingSkeleton } from "./skeletons/BookingSkeleton";
 import { CalendarOutlined, CheckCircleOutlined, EnvironmentOutlined, HomeOutlined, TeamOutlined, UserOutlined, } from "@ant-design/icons";
 import { useAppSelector, useAppDispatch } from "@/application/hooks";
 import { confirmBooking } from "@/application/slices/bookingSlice";
@@ -25,7 +26,7 @@ export function Booking() {
   }
 
   if (status === "loadingPreview") {
-    return <Card loading style={{ width: 500 }} />;
+    return <BookingSkeleton />;
   }
 
   if (!preview || !isReady) {
