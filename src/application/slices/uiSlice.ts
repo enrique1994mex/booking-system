@@ -1,26 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface UIState {
-  globalLoading: boolean;
+  bootstrapping: boolean;
 }
 
 const initialState: UIState = {
-  globalLoading: false,
-};  
+  bootstrapping: false,
+};
 
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    showGlobalLoading(state) {
-      state.globalLoading = true;
+    showBootstrapping(state) {
+      state.bootstrapping = true;
     },
-    hideGlobalLoading(state) {
-      state.globalLoading = false;
+    hideBootstrapping(state) {
+      state.bootstrapping = false;
     },
   },
 });
 
-export const { showGlobalLoading, hideGlobalLoading } = uiSlice.actions;
+export const { showBootstrapping, hideBootstrapping } = uiSlice.actions;
 export default uiSlice.reducer;
 export type { UIState };

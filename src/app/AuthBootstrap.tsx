@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useAppDispatch } from "@/application/hooks";
 import { setUser, getCurrentUser } from "@/application/slices/authSlice";
+import { showBootstrapping, hideBootstrapping } from "@/application/slices/uiSlice";
 import { onAuthStateChangeService } from "@/application/services/AuthService";
 
 export function AuthBootstrap({ children }: { children: React.ReactNode }) {
@@ -14,7 +15,8 @@ export function AuthBootstrap({ children }: { children: React.ReactNode }) {
     initialized.current = true;
 
     // 1. Rehydrate session on app load
-    dispatch(getCurrentUser());
+    dispatch(showBootstrapping());
+    dispatch(getCurrentUser()).finally(() => dispatch(hideBootstrapping()));
 
     // 2. Listen for auth state changes (login/logout in other tabs)
     const unsubscribe = onAuthStateChangeService((user) => {

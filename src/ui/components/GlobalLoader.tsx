@@ -4,7 +4,7 @@ import { Spin } from "antd";
 import { useAppSelector } from "@/application/hooks";
 
 export function GlobalLoader() {
-  const loading = useAppSelector((state) => state.ui.globalLoading);
+  const loading = useAppSelector((state) => state.ui.bootstrapping);
 
   if (!loading) return null;
 
