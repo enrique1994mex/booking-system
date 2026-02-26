@@ -1,7 +1,8 @@
 "use client";
 
-import { Alert, Button, Card, Divider, Empty, Flex, Typography, } from "antd";
+import { Button, Card, Divider, Empty, Flex, Typography, } from "antd";
 import { BookingSkeleton } from "./skeletons/BookingSkeleton";
+import { ErrorResult } from "./ErrorResult";
 import { CalendarOutlined, CheckCircleOutlined, EnvironmentOutlined, HomeOutlined, TeamOutlined, UserOutlined, } from "@ant-design/icons";
 import { useAppSelector, useAppDispatch } from "@/application/hooks";
 import { confirmBooking } from "@/application/slices/bookingSlice";
@@ -20,9 +21,9 @@ export function Booking() {
 
   const isConfirming = status === "confirming";
   const isReady = status === "readyToConfirm";
-
+  
   if (error) {
-    return <Alert type="error" title={error} showIcon />;
+    return <ErrorResult error={error} />;
   }
 
   if (status === "loadingPreview") {

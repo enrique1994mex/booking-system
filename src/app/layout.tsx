@@ -4,6 +4,7 @@ import { ConfigProvider } from "antd";
 import { antdTheme } from "@/ui/theme/antdTheme";
 import { RootLayout } from "@/ui/layouts/RootLayout";
 import { GlobalLoader } from "@/ui/components/GlobalLoader";
+import { ErrorBoundary } from "@/ui/components/ErrorBoundary";
 import { Providers } from "@/app/providers";
 import { AuthBootstrap } from "@/app/AuthBootstrap";
 import "./globals.css";
@@ -22,10 +23,12 @@ export default function Layout({
     <AntdRegistry>
       <ConfigProvider theme={antdTheme}>
         <Providers>
-          <AuthBootstrap>
-            <GlobalLoader />
-            <RootLayout>{children}</RootLayout>
-          </AuthBootstrap>
+          <ErrorBoundary>
+            <AuthBootstrap>
+              <GlobalLoader />
+              <RootLayout>{children}</RootLayout>
+            </AuthBootstrap>
+          </ErrorBoundary>
         </Providers>
       </ConfigProvider>
     </AntdRegistry>

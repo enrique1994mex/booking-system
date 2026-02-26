@@ -1,6 +1,7 @@
 "use client";
 
-import { Alert, Empty, Flex, Typography, Badge, Tag, Divider } from "antd";
+import { Empty, Flex, Typography, Badge, Tag, Divider } from "antd";
+import { ErrorResult } from "./ErrorResult";
 import { EnvironmentOutlined } from "@ant-design/icons";
 import { useAppSelector } from "@/application/hooks";
 import Image from "next/image";
@@ -66,7 +67,7 @@ export function Accommodation() {
   }, [data]);
 
   if (error) {
-    return <Alert type="error" title={error} />;
+    return <ErrorResult error={error} />;
   }
 
   if (!data) return <Empty description="No rooms available" />;

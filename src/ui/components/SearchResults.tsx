@@ -1,6 +1,7 @@
 "use client";
 
-import { Alert, Typography, Tag, Button, Flex, Badge } from "antd";
+import { Typography, Tag, Button, Flex, Badge } from "antd";
+import { ErrorResult } from "./ErrorResult";
 import { EnvironmentOutlined } from "@ant-design/icons";
 import { mapSearchResultToCardVM } from "../mappers/mapSearchResultToCardVM";
 import { AccommodationSearchCardVM } from "../models/AccommodationSearchCardVM";
@@ -144,7 +145,7 @@ export function SearchResults() {
   );
 
   if (error) {
-    return <Alert type="error" title={error} />;
+    return <ErrorResult error={error} />;
   }
 
   return (

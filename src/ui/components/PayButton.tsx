@@ -3,6 +3,9 @@
 import { Button } from "antd";
 import { CreditCardOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import { apiClient } from "@/infrastructure/http/apiClient";
+import { isAppError } from "@/domain/errors/AppError";
+import { toastError } from "@/application/utils/toastError";
 
 type PaymentStage = "idle" | "creating" | "redirecting";
 
@@ -18,23 +21,17 @@ export function PayButton({ bookingId }: { bookingId: string }) {
   const handlePay = async () => {
     setStage("creating");
     try {
-      const res = await fetch("/api/payments/checkout", {
+      const { url } = await apiClient<{ url: string }>("/api/payments/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bookingId }),
       });
 
-      if (!res.ok) {
-        const error = await res.json();
-        console.error("Checkout error:", error);
-        throw new Error("Failed to create checkout session");
-      }
-
-      const { url } = await res.json();
       setStage("redirecting");
       window.location.href = url;
-    } catch {
+    } catch (e) {
       setStage("idle");
+      if (isAppError(e)) toastError(e);
     }
   };
 
