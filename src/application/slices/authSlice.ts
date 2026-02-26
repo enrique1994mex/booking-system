@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "@/domain/entities/User";
+import { AppError } from "@/domain/errors/AppError";
 import { AuthCredentials, SignUpData } from "@/domain/repositories/AuthRepository";
 import { signInService, signUpService, signOutService, getCurrentUserService } from "../services/AuthService";
 
@@ -7,7 +8,7 @@ export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  error: string | null;
+  error: AppError | null;
 }
 
 const initialState: AuthState = {
@@ -17,52 +18,65 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const signIn = createAsyncThunk<User, AuthCredentials, { rejectValue: string }>(
+function mapAuthError(error: unknown): AppError {
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes("invalid") || msg.includes("credentials") || msg.includes("password")) {
+      return { code: "UNAUTHORIZED", message: "Invalid email or password." };
+    }
+    if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+      return { code: "FORBIDDEN", message: "An account with this email already exists." };
+    }
+    if (msg.includes("network") || msg.includes("fetch") || msg.includes("connect")) {
+      return { code: "NETWORK_ERROR", message: "Unable to connect. Check your connection." };
+    }
+  }
+  return { code: "UNKNOWN", message: "Authentication failed. Please try again." };
+}
+
+export const signIn = createAsyncThunk<User, AuthCredentials, { rejectValue: AppError }>(
   "auth/signIn",
   async (credentials, { rejectWithValue }) => {
     try {
       const session = await signInService(credentials);
       return session.user;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Sign in failed";
-      return rejectWithValue(message);
+      return rejectWithValue(mapAuthError(error));
     }
   }
 );
 
-export const signUp = createAsyncThunk<User, SignUpData, { rejectValue: string }>(
+export const signUp = createAsyncThunk<User, SignUpData, { rejectValue: AppError }>(
   "auth/signUp",
   async (data, { rejectWithValue }) => {
     try {
       const session = await signUpService(data);
       return session.user;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Sign up failed";
-      return rejectWithValue(message);
+      return rejectWithValue(mapAuthError(error));
     }
   }
 );
 
-export const signOut = createAsyncThunk<void, void, { rejectValue: string }>(
+export const signOut = createAsyncThunk<void, void, { rejectValue: AppError }>(
   "auth/signOut",
   async (_, { rejectWithValue }) => {
     try {
       await signOutService();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Sign out failed";
-      return rejectWithValue(message);
+    } catch {
+      return rejectWithValue({ code: "UNKNOWN", message: "Sign out failed. Please try again." });
     }
   }
 );
 
-export const getCurrentUser = createAsyncThunk<User | null, void, { rejectValue: string }>(
+// getCurrentUser is a silent bootstrap check — failure means no session, not an error
+export const getCurrentUser = createAsyncThunk<User | null, void, { rejectValue: AppError }>(
   "auth/getCurrentUser",
   async (_, { rejectWithValue }) => {
     try {
       return await getCurrentUserService();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to get current user";
-      return rejectWithValue(message);
+    } catch {
+      return rejectWithValue({ code: "UNAUTHORIZED", message: "No active session." });
     }
   }
 );
@@ -96,7 +110,7 @@ const authSlice = createSlice({
       })
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? "Sign in failed";
+        state.error = action.payload ?? { code: "UNKNOWN", message: "Authentication failed. Please try again." };
       })
       // signUp
       .addCase(signUp.pending, (state) => {
@@ -110,7 +124,7 @@ const authSlice = createSlice({
       })
       .addCase(signUp.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? "Sign up failed";
+        state.error = action.payload ?? { code: "UNKNOWN", message: "Authentication failed. Please try again." };
       })
       // signOut
       .addCase(signOut.pending, (state) => {
@@ -122,23 +136,22 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
       })
-      .addCase(signOut.rejected, (state, action) => {
+      .addCase(signOut.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload ?? "Sign out failed";
+        // error surfaced as toast in useAuth, not stored in state
       })
-      // getCurrentUser
+      // getCurrentUser — silent: no session is normal, not an error
       .addCase(getCurrentUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = action.payload !== null;
       })
-      .addCase(getCurrentUser.rejected, (state, action) => {
+      .addCase(getCurrentUser.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload ?? "Failed to get current user";
+        // intentionally no error stored — unauthenticated is the default state
       });
   },
 });
