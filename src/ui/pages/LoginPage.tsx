@@ -40,7 +40,7 @@ export function LoginPage({ redirectTo }: LoginPageProps) {
 
         {error && (
           <Alert
-            title={error}
+            title={error.message}
             type="error"
             showIcon
             closable
