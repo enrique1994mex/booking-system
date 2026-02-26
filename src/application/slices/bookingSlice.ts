@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from "../store";
+import { AppError } from '@/domain/errors/AppError';
 import { BookingPreviewVM } from '@/ui/models/BookingPreviewVM';
 import { mapBookingPreviewVM } from '@/ui/mappers/mapBookingPreviewVM';
 import { getRoomDetailService } from '../services/getRoomDetailService';
@@ -13,7 +14,7 @@ type BookingStatus =
   | "error";
 
 interface BookingState {
-  error: string | null;
+  error: AppError | null;
   preview: BookingPreviewVM | null;
   bookingId: string | null;
   status: BookingStatus;
@@ -26,30 +27,24 @@ const initialState: BookingState = {
   status: "idle",
 };
 
-// Async thunk to get room details
 export const getRoomDetail = createAsyncThunk<
   BookingPreviewVM,
   { roomId: string, dateRange: { from: string; to: string } },
-  { rejectValue: string }
+  { rejectValue: AppError }
 >(
   'booking/getRoomDetail',
   async (params, { rejectWithValue }) => {
     try {
-      // Service call to get room details
       const result = await getRoomDetailService(params.roomId);
-
-      // Map to BookingPreviewVM
       const vm = mapBookingPreviewVM(result, params.dateRange);
-
       return vm;
     } catch (error) {
       console.error("Preview booking error:", error);
-      return rejectWithValue("Failed to load booking preview");
-    } 
-  } 
+      return rejectWithValue({ code: "SERVER_ERROR", message: "Failed to load booking preview." });
+    }
+  }
 );
 
-// Async thunk to create a booking
 export const confirmBooking = createAsyncThunk<
   string,
   {
@@ -60,7 +55,7 @@ export const confirmBooking = createAsyncThunk<
   },
   {
     state: RootState;
-    rejectValue: string
+    rejectValue: AppError;
   }
 >(
   "booking/confirmBooking",
@@ -78,7 +73,7 @@ export const confirmBooking = createAsyncThunk<
       return booking.id;
     } catch (error) {
       console.error("Confirm booking error:", error);
-      return rejectWithValue("Failed to confirm booking");
+      return rejectWithValue({ code: "SERVER_ERROR", message: "Failed to confirm booking. Please try again." });
     }
   }
 );
@@ -96,7 +91,6 @@ const bookingSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Preview 
       .addCase(getRoomDetail.pending, (state) => {
         state.status = "loadingPreview";
       })
@@ -106,10 +100,9 @@ const bookingSlice = createSlice({
         state.status = "readyToConfirm";
       })
       .addCase(getRoomDetail.rejected, (state, action) => {
-        state.error = action.payload ?? "Unknown error";
+        state.error = action.payload ?? { code: "UNKNOWN", message: "Unexpected error." };
         state.status = "error";
       })
-      // Confirm Booking
       .addCase(confirmBooking.pending, (state) => {
         state.status = "confirming";
       })
@@ -120,7 +113,7 @@ const bookingSlice = createSlice({
         state.status = "idle";
       })
       .addCase(confirmBooking.rejected, (state, action) => {
-        state.error = action.payload ?? "Unknown error";
+        state.error = action.payload ?? { code: "UNKNOWN", message: "Unexpected error." };
         state.status = "error";
       });
   },

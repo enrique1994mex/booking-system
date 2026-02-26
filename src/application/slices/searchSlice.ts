@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AppError } from '@/domain/errors/AppError';
 import { searchAccommodationsService } from '../services/SearchService';
 
 interface SearchParams {
@@ -24,7 +25,7 @@ interface SearchResult {
 
 interface SearchState {
   loading: boolean;
-  error: string | null;
+  error: AppError | null;
   results: SearchResult[];
   criteria: SearchCriteria | null;
 }
@@ -39,13 +40,11 @@ const initialState: SearchState = {
 export const searchAvailableAccomodations = createAsyncThunk<
   { results: SearchResult[]; criteria: SearchCriteria },
   SearchParams,
-  { rejectValue: string }
+  { rejectValue: AppError }
 >(
   'search/searchAvailableAccommodations',
   async (params: SearchParams, { rejectWithValue }) => {
     try {
-
-      // Service call to search accommodations
       const result = await searchAccommodationsService(
         { city: params.location.city, country: params.location.country },
         params.startDate,
@@ -62,7 +61,7 @@ export const searchAvailableAccomodations = createAsyncThunk<
 
     } catch (e) {
       console.error('Search error:', e);
-      return rejectWithValue('Search failed. Please try again.');
+      return rejectWithValue({ code: "SERVER_ERROR", message: "Search failed. Please try again." });
     }
   }
 );
@@ -89,11 +88,11 @@ const searchSlice = createSlice({
       })
       .addCase(searchAvailableAccomodations.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Unexpected error';
+        state.error = action.payload ?? { code: "UNKNOWN", message: "Unexpected error." };
       });
   },
 });
 
 export const { clearSearchResults } = searchSlice.actions;
-export default searchSlice.reducer; 
+export default searchSlice.reducer;
 export type { SearchState };

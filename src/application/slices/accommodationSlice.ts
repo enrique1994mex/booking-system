@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AppError } from '@/domain/errors/AppError';
 import { AccommodationCardVM } from '@/ui/models/AccommodationCardVM';
 import { mapAccommodationVM } from '@/ui/mappers/mapAccommodationVM';
 import { getAccommodationAvailabilityService } from '../services/AccommodationService';
 
 interface AccommodationState {
   loading: boolean;
-  error: string | null;
+  error: AppError | null;
   data: AccommodationCardVM | null;
 }
 
@@ -18,12 +19,11 @@ const initialState: AccommodationState = {
 export const getAccommodationAvailability = createAsyncThunk<
   AccommodationCardVM,
   { accommodationId: string; startDate: string; endDate: string },
-  { rejectValue: string }
+  { rejectValue: AppError }
 >(
   'accommodation/getAvailability',
   async (params, { rejectWithValue }) => {
     try {
-      // Service call to get accommodation availability
       const result = await getAccommodationAvailabilityService(
         params.accommodationId,
         params.startDate,
@@ -35,7 +35,7 @@ export const getAccommodationAvailability = createAsyncThunk<
       return vm;
     } catch (e) {
       console.error('Accommodation availability error:', e);
-      return rejectWithValue("Accommodation not available");
+      return rejectWithValue({ code: "NOT_FOUND", message: "Accommodation not available." });
     }
   }
 );
@@ -60,7 +60,7 @@ const accommodationSlice = createSlice({
       })
       .addCase(getAccommodationAvailability.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? "Unexpected error";
+        state.error = action.payload ?? { code: "UNKNOWN", message: "Unexpected error." };
       });
   },
 });
